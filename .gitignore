@@ -1,0 +1,9 @@
+# These are the files and directories to be ignored by Git
+.env
+credentials.json
+credentials_oauth.json
+test_system.py
+
+/recruit_venv
+
+/logs
