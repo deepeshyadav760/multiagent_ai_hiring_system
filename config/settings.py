@@ -69,7 +69,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 import os
 
-class Settings(Base-settings):
+class Settings(BaseSettings):
     """Application settings loaded from environment variables"""
     
     # --- Keys and Secrets ---
@@ -103,6 +103,7 @@ class Settings(Base-settings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     ENV: str = "development" # Environment (e.g., development, production)
+    FRONTEND_URL: str = "http://127.0.0.1:5500" # Add this line with a default value
     
     # --- File Paths ---
     VECTOR_STORE_PATH: str = "./data/vector_store"
