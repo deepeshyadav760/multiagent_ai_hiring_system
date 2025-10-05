@@ -1,7 +1,7 @@
 // script.js
 
-// const API_BASE = 'http://localhost:8000';
-const API_BASE = 'https://0f26c1f1e980.ngrok-free.app'
+const API_BASE = 'http://localhost:8000';
+// const API_BASE = 'https://0f26c1f1e980.ngrok-free.app'
 
 // State
 let currentTab = 'dashboard';
