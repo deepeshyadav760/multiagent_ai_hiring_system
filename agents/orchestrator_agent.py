@@ -94,23 +94,21 @@ class OrchestratorAgent:
             log.error(f"Orchestrator error in application processing: {e}")
             return {"success": False, "error": str(e)}
     
-
     def process_candidate_shortlisting(self, candidate_email: str, job_id: str) -> Dict:
         """
         Process candidate shortlisting by creating an AI interview record
-        and sending an invitation email with the correct public link.
+        and sending an invitation email.
         """
         try:
             log.info(f"Orchestrator: Processing AI interview shortlisting for {candidate_email} for job {job_id}")
             
+            # Step 1: Generate a unique ID and the interview link
             unique_interview_id = str(ObjectId())
-            
-            ### FIX: Use the configurable frontend URL from settings ###
-            # This generates the correct public link for the email.
-            base_url = settings.FRONTEND_URL.strip('/')
-            ai_interview_link = f"{base_url}/frontend/interview.html?interview_id={unique_interview_id}"
+            # IMPORTANT: This URL should point to where your frontend is served.
+            # If you open index.html directly, this path needs to be correct.
+            ai_interview_link = f"http://127.0.0.1:5500/frontend/interview.html?interview_id={unique_interview_id}"
 
-            # Step 2: Save the interview record to the database (no changes here)
+            # Step 2: Save the interview record to the database
             database_tool._run(
                 action="insert",
                 collection="interviews",
@@ -119,14 +117,14 @@ class OrchestratorAgent:
                     "job_id": job_id,
                     "candidate_id": candidate_email,
                     "status": "pending_ai_interview",
-                    "meeting_link": ai_interview_link,
+                    "meeting_link": ai_interview_link, # Re-using this field for the link
                     "created_at": datetime.utcnow(),
                     "updated_at": datetime.utcnow(),
                 }
             )
             log.info(f"Successfully created AI interview record {unique_interview_id} in database.")
 
-            # Step 3: Send the interview invitation email (no changes here)
+            # Step 3: Send the interview invitation email with the new link
             self.communication_agent.send_interview_invitation(
                 candidate_email=candidate_email,
                 job_id=job_id,
@@ -144,8 +142,6 @@ class OrchestratorAgent:
             log.error(f"Orchestrator error in AI interview shortlisting: {e}")
             return {"success": False, "error": str(e)}
     
-
-
     def process_post_interview_decision(self, interview_id: str):
         """
         After an AI interview is complete, this function is called to make a final

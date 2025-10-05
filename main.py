@@ -1,6 +1,6 @@
 # main.py
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import shutil
@@ -68,16 +68,9 @@ app.include_router(interviews.router)
 UPLOADS_DIR = "uploads"
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 @app.post("/upload-resume/", tags=["Resume"])
-async def handle_resume_upload(
-    background_tasks: BackgroundTasks, # Add this parameter
-    file: UploadFile = File(...)
-):
-    """
-    Handles resume file upload. Immediately returns a response and
-    starts the long-running agentic process in the background.
-    """
+async def handle_resume_upload(file: UploadFile = File(...)):
+    # ... (code for this endpoint remains the same)
     try:
-        # Save the file immediately
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         safe_filename = f"{timestamp}_{file.filename.replace(' ', '_')}"
         file_path = os.path.join(UPLOADS_DIR, safe_filename)
@@ -86,19 +79,19 @@ async def handle_resume_upload(
             shutil.copyfileobj(file.file, buffer)
         log.info(f"Resume uploaded and saved to: {file_path}")
 
-        # Add the time-consuming task to the background queue
-        background_tasks.add_task(orchestrator.process_candidate_application, file_path)
+        result = orchestrator.process_candidate_application(file_path)
         
-        # Return an immediate success response to the frontend
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("error", "Failed to process resume."))
+
         return {
             "success": True,
-            "message": "Resume received. Processing has started in the background.",
+            "message": result.get("message", "Resume processed successfully."),
         }
     except Exception as e:
-        log.error(f"Error during initial resume upload handling: {e}")
+        log.error(f"Error during resume upload: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
-        # The file object must be closed in the main thread
         file.file.close()
 
 
