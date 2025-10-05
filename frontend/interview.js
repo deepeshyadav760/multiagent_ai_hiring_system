@@ -34,7 +34,9 @@ async function setupCamera() {
 
 // 2. Setup WebSocket
 function setupWebSocket(stream) {
-    socket = new WebSocket(`ws://localhost:8000/ws/interview/${interviewId}`);
+    // socket = new WebSocket(`ws://localhost:8000/ws/interview/${interviewId}`);
+
+    socket = new WebSocket(`wss://0f26c1f1e980.ngrok-free.app/ws/interview/${interviewId}`);
 
     socket.onopen = () => statusEl.textContent = "Connection established. The interview will begin shortly.";
 
