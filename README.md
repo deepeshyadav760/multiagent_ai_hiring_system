@@ -17,412 +17,272 @@ A fully functional, production-ready AI recruiting system powered by multi-agent
 ## 🏗️ Architecture
 
 ### Multi-Agent System (Hierarchical Pattern)
+---
 
-This system implements a **hierarchical agent architecture** with 6 specialized agents:
+## ✨ Core Features
 
-1. **Orchestrator Agent** (Manager) - Coordinates all other agents and manages workflow
-2. **Resume Parsing Agent** - Extracts structured data from resumes
-3. **Job-Candidate Matching Agent** - Uses RAG for semantic job matching
-4. **Interview Scheduling Agent** - Manages calendar and schedules interviews
-5. **Communication Agent** - Handles all candidate communications
-6. **Compliance Agent** - Ensures fair, unbiased, and compliant recruitment
+- 🧠 **Multi-Agent Architecture**: Powered by CrewAI, the system uses a team of specialized agents (Orchestrator, Parsing, Matching, Interviewer, etc.) working together under a Master Control Protocol (MCP) to manage a robust, sequential workflow.
 
-### Technology Stack
+- 🎯 **Intelligent Job Matching**: Goes beyond keywords. Uses a two-stage process combining the speed of FAISS vector similarity search with the deep contextual understanding of Llama 3 to score candidates with high accuracy.
 
-- **Framework**: FastAPI
-- **Agent Framework**: CrewAI (with hierarchical process)
-- **LLM**: Groq API (Llama3 70B)
-- **Embeddings**: sentence-transformers (MiniLM-L6-v2)
-- **Vector Store**: FAISS
-- **Database**: MongoDB (localhost:27017)
-- **MCP**: Model Context Protocol for tool standardization
-- **LlamaIndex**: For document processing and RAG
+- 🤖 **Autonomous AI Interviews**: Shortlisted candidates are invited to a real-time, conversational interview conducted by an AI. The system handles question generation, speech-to-text (via Whisper), and final evaluation.
 
-## 🚀 Features
+- 👁️ **AI-Powered Proctoring**: The interview room uses client-side AI (face-api.js) to monitor the candidate's video feed, ensuring a fair and focused assessment environment by detecting multiple people.
 
-### Core Capabilities
+- 🚀 **Proactive Sourcing**: When a new job is posted, a dedicated Sourcing Agent automatically scans the entire database of past candidates (within the last year) to find and re-engage qualified talent.
 
-✅ **Automated Resume Processing**
-- Parse PDF/DOCX resumes
-- Extract skills, experience, education
-- Natural language understanding via LLM
+- ⚖️ **Built-in Compliance**: A Compliance Agent scans every resume for potentially biasing information (related to age, gender, ethnicity) and logs a risk report, promoting fair and equitable hiring practices.
 
-✅ **Intelligent Job Matching (RAG)**
-- Semantic search using embeddings
-- LLM-powered candidate ranking
-- Contextual job-candidate alignment
+- 🌐 **Full-Stack Application**: Features a clean, responsive frontend dashboard and a powerful FastAPI backend, ready for deployment.
 
-✅ **Interview Automation**
-- Calendar integration
-- Automatic scheduling
-- Meeting link generation
+- 🔗 **Automated Ingestion**: Seamlessly processes new candidates from a manual resume upload feature or via a connected Google Form.
 
-✅ **Communication Management**
-- Application confirmations
-- Interview invitations
-- Follow-up reminders
-- Rejection notices
+---
 
-✅ **Compliance & Diversity**
-- Bias detection in resumes
-- Audit trail logging
-- Fair evaluation standards
+## 📊 System Workflow
+```mermaid
+graph TD
+    classDef start_end fill:#f96,stroke:#333,stroke-width:2px;
+    classDef phase_gate fill:#fec,stroke:#333,stroke-width:4px;
+    classDef agent fill:#cfc,stroke:#333,stroke-width:2px;
+    classDef db fill:#e9e,stroke:#333,stroke-width:2px;
 
-## 📦 Installation
+    Start((Start: Candidate Applies)):::start_end
+
+    subgraph "Phase 1: Pre-Screening & Automated Vetting"
+        direction TB
+        Start --> API[Backend API]
+        API --> Parser[1. Parse Resume & Create Embedding]:::agent
+        Parser --> Compliance[2. Scan for Bias]:::agent
+        Compliance --> Vetting[3. Vet in Parallel - GitHub/Web]:::agent
+        Vetting --> Matcher[4. Match to Jobs - FAISS + LLM]:::agent
+        Matcher --> Score[Save Match Score]:::db
+    end
+
+    Score --> Decision1{Initial Score >= 50?}:::phase_gate
+
+    subgraph "Phase 2: Autonomous AI Interview & Evaluation"
+        direction TB
+        Decision1 -- Yes --> Invite[1. Send AI Interview Invite]:::agent
+        Invite --> Interview[2. Candidate Takes AI Interview]
+        Interview --> Evaluation[3. Evaluate Transcript & Score]:::agent
+        Evaluation --> InterviewScore[Save Interview Score]:::db
+    end
+
+    InterviewScore --> Decision2{Final Score >= 70?}:::phase_gate
+
+    subgraph "Phase 3: Final Decision & Communication"
+        direction TB
+        Decision2 -- Yes --> Hire[Send Next Steps Email]:::agent
+        Decision2 -- No --> FinalReject[Send Final Rejection Email]:::agent
+    end
+
+    Decision1 -- No --> InitialReject[Send Initial Rejection Email]:::agent
+
+    InitialReject --> End((Process Ends)):::start_end
+    Hire --> End
+    FinalReject --> End
+```
+
+---
+
+## 🛠️ Technology Stack
+
+The project is built on a modern, scalable, and cost-effective tech stack.
+
+### Backend
+- **Language:** Python
+- **Framework:** FastAPI, Uvicorn
+- **Agentic Framework:** CrewAI
+- **AI Models:**
+  - **LLM:** Groq (Llama 3)
+  - **Speech-to-Text:** `faster-whisper`
+  - **Embeddings:** `sentence-transformers`
+- **Databases:** MongoDB (Primary), FAISS (Vector Search)
+
+### Frontend
+- **Core:** HTML5, CSS3, Vanilla JavaScript
+- **Browser APIs:** Fetch, WebSockets, MediaRecorder, SpeechSynthesis
+- **AI Proctoring:** `face-api.js` (Client-Side)
+
+### Deployment & Infrastructure
+- **Frontend:** Vercel
+- **Backend:** Render (Recommended for WebSocket support)
+- **Database:** MongoDB Atlas
+- **Development Tunneling:** `ngrok`
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to get the application running on your local machine.
 
 ### Prerequisites
 
-- Python 3.10+
-- MongoDB running on localhost:27017
-- Groq API key
+- Python 3.11+
+- MongoDB installed and running locally, or a MongoDB Atlas cluster
+- A Groq API Key
+- Git
 
-### Setup
-
-1. **Clone and install dependencies**
-
+### 1. Clone the Repository
 ```bash
-git clone <repository>
-cd ai-recruiting-system
+git clone https://github.com/your-username/agentic-ai-hr-system.git
+cd agentic-ai-hr-system
+```
+
+### 2. Set Up the Backend
+
+#### Create and activate a virtual environment:
+```bash
+python -m venv recruit_venv
+
+# On Windows
+recruit_venv\Scripts\Activate
+
+# On macOS/Linux
+source recruit_venv/bin/activate
+```
+
+#### Install dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
-2. **Download spaCy model**
+#### Configure environment variables:
 
-```bash
-python -m spacy download en_core_web_sm
+Create a file named `.env` in the root directory and add the following:
+```env
+GROQ_API_KEY="your_groq_api_key"
+MONGODB_URI="mongodb://localhost:27017"  # Or your MongoDB Atlas connection string
+FRONTEND_URL="http://127.0.0.1:5500"
+
+# Add any other secrets like email passwords, etc.
 ```
 
-3. **Configure environment**
-
-Create `.env` file:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and add your Groq API key:
-
-```
-GROQ_API_KEY=your_groq_api_key_here
-MONGODB_URL=mongodb://localhost:27017
-```
-
-4. **Create necessary directories**
-
-```bash
-mkdir -p uploads logs data
-```
-
-5. **Start MongoDB**
-
-```bash
-# If using Docker
-docker run -d -p 27017:27017 --name mongodb mongo:latest
-
-# Or start your local MongoDB instance
-mongod --dbpath /path/to/data
-```
-
-## 🎯 Usage
-
-### Start the Server
-
+#### Run the backend server:
 ```bash
 python main.py
 ```
 
-The API will be available at `http://localhost:8000`
+The server should now be running on `http://localhost:8000`.
 
-API Documentation: `http://localhost:8000/docs`
+### 3. Set Up the Frontend
 
-### API Endpoints
+#### Download Face-API Models:
 
-#### 1. Upload Resume
+The client-side proctoring requires pre-trained models. Create a `models` folder inside the `frontend` directory and place the necessary `face-api.js` model files there.
 
+#### Serve the frontend:
+
+**Option 1 - Using VS Code:**
+- Install the "Live Server" extension
+- Right-click on `frontend/index.html`
+- Choose "Open with Live Server"
+
+**Option 2 - Using Python:**
 ```bash
-curl -X POST "http://localhost:8000/upload/resume" \
-  -F "file=@resume.pdf"
+python -m http.server 5500
 ```
 
-**What happens:**
-1. Resume is parsed
-2. Candidate profile created
-3. Confirmation email sent
-4. Compliance scan performed
-5. Jobs matched automatically
-6. Scores calculated
+Then, open your browser and navigate to `http://127.0.0.1:5500/frontend/`.
 
-#### 2. Create Job Posting
+The application dashboard should now be live and connected to your local backend.
 
-```bash
-curl -X POST "http://localhost:8000/jobs/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "job_id": "JOB-001",
-    "title": "Senior Python Developer",
-    "description": "We are looking for an experienced Python developer...",
-    "required_skills": ["Python", "FastAPI", "MongoDB", "AI/ML"],
-    "experience_required": 5,
-    "location": "Remote",
-    "employment_type": "full-time"
-  }'
+---
+
+## 📁 Project Structure
+```
+agentic-ai-hr-system/
+├── backend/
+│   ├── agents/              # CrewAI agent definitions
+│   ├── crews/               # Crew configurations
+│   ├── tools/               # Custom tools for agents
+│   ├── models/              # Data models
+│   ├── routes/              # API endpoints
+│   └── utils/               # Utility functions
+├── frontend/
+│   ├── index.html           # Dashboard
+│   ├── interview.html       # AI Interview Room
+│   ├── css/                 # Stylesheets
+│   ├── js/                  # JavaScript files
+│   └── models/              # face-api.js models
+├── requirements.txt
+├── main.py                  # FastAPI application entry point
+├── .env.example
+└── README.md
 ```
 
-#### 3. Get Top Candidates for Job
+---
 
-```bash
-curl -X GET "http://localhost:8000/jobs/JOB-001/candidates?top_n=10"
-```
+## 🎯 Usage
 
-#### 4. Shortlist Candidate (Schedule Interview)
+### For Recruiters
 
-```bash
-curl -X POST "http://localhost:8000/candidates/john@example.com/shortlist/JOB-001"
-```
+1. **Post a Job**: Navigate to the "Jobs" section and create a new job posting with requirements
+2. **Upload Resumes**: Use the upload feature or connect a Google Form for automatic ingestion
+3. **Monitor Progress**: Watch as the AI agents automatically process candidates through each phase
+4. **Review Results**: Check the dashboard for candidate scores, interview transcripts, and hiring recommendations
 
-**What happens:**
-1. Interview time slot found
-2. Calendar booking created
-3. Interview invitation sent
-4. Meeting link generated
+### For Candidates
 
-#### 5. Get All Candidates
+1. **Apply**: Submit your resume through the application portal or Google Form
+2. **Automated Vetting**: Your profile is automatically parsed, vetted, and matched to relevant positions
+3. **AI Interview**: If shortlisted, receive an email invitation to complete an AI-powered interview
+4. **Get Feedback**: Receive automated communication about your application status
 
-```bash
-curl -X GET "http://localhost:8000/candidates/?status=pending&min_score=70"
-```
+---
 
-#### 6. Check System Health
+## 🔒 Security & Privacy
 
-```bash
-curl -X GET "http://localhost:8000/health"
-```
+- All candidate data is stored securely in MongoDB
+- Client-side proctoring respects user privacy (no video recording, only real-time analysis)
+- Compliance agent helps ensure fair hiring practices
+- API authentication can be easily added for production deployments
 
-#### 7. View Agent Status
+---
 
-```bash
-curl -X GET "http://localhost:8000/agents/status"
-```
+## 💡 Future Enhancements
 
-## 🔧 Configuration
+This platform is built to be extensible. Future work could include:
 
-### LLM Configuration
+- **Parallel Vetting Crew**: Adding agents to scrape LinkedIn and GitHub profiles in parallel for a richer candidate profile
+- **Advanced Analytics**: Building out the dashboard with more charts, such as skills distribution and time-to-hire metrics
+- **Human-in-the-Loop**: Adding a stage for a human recruiter to approve or reject an AI's decision before the final email is sent
+- **Hybrid Interview Flow**: For high-scoring AI interviews, automatically schedule a final-round human interview using the calendar tool
+- **Multi-language Support**: Expand the interview system to support candidates in multiple languages
+- **Integration Marketplace**: Connect with popular ATS systems, LinkedIn Recruiter, and other HR tools
 
-Edit `config/settings.py`:
-
-```python
-LLM_MODEL = "llama3-70b-8192"  # Groq model
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-```
-
-### Email Configuration (Optional)
-
-For email notifications, configure SMTP in `.env`:
-
-```
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USERNAME=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
-```
-
-### Calendar Integration (Optional)
-
-For Google Calendar integration, add OAuth credentials:
-
-```
-GOOGLE_CLIENT_ID=your_client_id
-GOOGLE_CLIENT_SECRET=your_client_secret
-```
-
-## 📊 System Workflow
-
-```
-Resume Upload → Parse Resume → Store in DB
-                    ↓
-              Compliance Scan
-                    ↓
-              Job Matching (RAG)
-                    ↓
-              Rank Candidates
-                    ↓
-              Recruiter Review
-                    ↓
-              ┌─────┴─────┐
-         Shortlist     Reject
-              ↓             ↓
-      Schedule Interview  Send Rejection
-              ↓
-      Send Invitation
-              ↓
-      Interview Reminder
-```
-
-## 🤖 Agent Details
-
-### 1. Orchestrator Agent (Hierarchical Manager)
-- **Role**: Master coordinator
-- **Tools**: All sub-agents
-- **Pattern**: Hierarchical delegation
-- **Responsibility**: End-to-end workflow management
-
-### 2. Resume Parsing Agent
-- **Role**: Document processor
-- **Tools**: Resume Parser, Database, Vector Search
-- **Responsibility**: Extract and structure resume data
-
-### 3. Matching Agent
-- **Role**: Intelligent matcher
-- **Tools**: Database, Vector Search, RAG
-- **Responsibility**: Semantic job-candidate matching
-
-### 4. Scheduling Agent
-- **Role**: Interview coordinator
-- **Tools**: Calendar, Database
-- **Responsibility**: Find slots and book interviews
-
-### 5. Communication Agent
-- **Role**: Candidate liaison
-- **Tools**: Email, Database
-- **Responsibility**: All candidate communications
-
-### 6. Compliance Agent
-- **Role**: Ethics officer
-- **Tools**: Database, LLM
-- **Responsibility**: Bias detection and audit trails
-
-## 🛠️ Tools (MCP-Compliant)
-
-1. **Resume Parser Tool** - Extract text from PDF/DOCX
-2. **Database Tool** - MongoDB CRUD operations
-3. **Vector Search Tool** - FAISS semantic search
-4. **Email Tool** - SMTP email sending
-5. **Calendar Tool** - Schedule management
-
-All tools are registered with the MCP server for standardized access.
-
-## 📈 Testing
-
-### Test Resume Upload
-
-```python
-import requests
-
-files = {'file': open('sample_resume.pdf', 'rb')}
-response = requests.post('http://localhost:8000/upload/resume', files=files)
-print(response.json())
-```
-
-### Test Job Creation and Matching
-
-```python
-# Create job
-job_data = {
-    "job_id": "TEST-001",
-    "title": "AI Engineer",
-    "description": "Build AI systems",
-    "required_skills": ["Python", "TensorFlow", "NLP"],
-    "experience_required": 3
-}
-response = requests.post('http://localhost:8000/jobs/', json=job_data)
-
-# Upload resume (will auto-match)
-files = {'file': open('ai_engineer_resume.pdf', 'rb')}
-response = requests.post('http://localhost:8000/upload/resume', files=files)
-
-# Check matches
-response = requests.get('http://localhost:8000/jobs/TEST-001/candidates')
-print(response.json())
-```
-
-## 🔒 Security & Compliance
-
-- Bias detection in candidate evaluation
-- Audit logging for all actions
-- GDPR-compliant data handling
-- Secure file uploads with validation
-- MongoDB access control
-
-## 📝 Database Schema
-
-### Collections
-
-**candidates**
-- name, email, phone
-- skills, experience_years, education
-- resume_text, score
-- matched_jobs, status
-
-**jobs**
-- job_id, title, description
-- required_skills, experience_required
-- status, matched_candidates
-
-**interviews**
-- candidate_id, job_id, recruiter_id
-- scheduled_time, status
-- meeting_link, notes
-
-**compliance_logs**
-- action_type, timestamp
-- bias_scan results
-- audit trails
-
-## 🚦 Production Deployment
-
-### Docker Deployment
-
-```dockerfile
-FROM python:3.10-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY . .
-
-CMD ["python", "main.py"]
-```
-
-### Environment Variables for Production
-
-```bash
-DEBUG=False
-MONGODB_URL=mongodb://mongo:27017
-GROQ_API_KEY=<production-key>
-```
-
-## 📊 Monitoring & Logs
-
-Logs are stored in `logs/` directory with rotation:
-- Application logs
-- Agent interactions
-- Tool executions
-- Error traces
+---
 
 ## 🤝 Contributing
 
-This is a complete, production-ready system. Key extension points:
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
-1. Add more tools via MCP
-2. Create new specialized agents
-3. Implement additional LLM providers
-4. Add more communication channels (Slack, SMS)
-5. Enhance compliance rules
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
 
 ## 📄 License
 
-MIT License
-
-## 🆘 Support
-
-For issues or questions:
-1. Check API docs at `/docs`
-2. Review logs in `logs/` directory
-3. Check MongoDB connection
-4. Verify Groq API key
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
+
+## 👥 Authors
+
+- **Your Name** - *Initial work* - [YourGitHub](https://github.com/your-username)
+
+---
+
+## 🙏 Acknowledgments
+
+- CrewAI for the powerful multi-agent framework
+- Groq for fast LLM inference
+- The open-source community for the amazing tools that made this possible
 
 **Built with**: CrewAI, FastAPI, Groq, MongoDB, FAISS, LlamaIndex
 
