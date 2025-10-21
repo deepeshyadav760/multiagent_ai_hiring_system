@@ -41,47 +41,81 @@ A fully functional, production-ready AI recruiting system powered by multi-agent
 
 ## 📊 System Workflow
 ```mermaid
+# AI-Powered Recruitment System
+
+## System Architecture Overview
+
+This document outlines the complete workflow of our AI-powered recruitment system, from candidate application to final hiring decision.
+
+## Process Flow Diagram
+
+```mermaid
 graph TD
+    %% === Node Classes ===
     classDef start_end fill:#f96,stroke:#333,stroke-width:2px;
-    classDef phase_gate fill:#fec,stroke:#333,stroke-width:4px;
-    classDef agent fill:#cfc,stroke:#333,stroke-width:2px;
+    classDef user_interaction fill:#ccf,stroke:#333,stroke-width:2px;
+    classDef main_agent fill:#fec,stroke:#333,stroke-width:2px;
+    classDef sub_agent fill:#cfc,stroke:#333,stroke-width:2px;
+    classDef parallel_agent fill:#9cf,stroke:#333,stroke-width:2px;
     classDef db fill:#e9e,stroke:#333,stroke-width:2px;
-
+    classDef service fill:#f9f,stroke:#333,stroke-width:2px;
+    %% --- Phase 1: Application ---
     Start((Start: Candidate Applies)):::start_end
-
-    subgraph "Phase 1: Pre-Screening & Automated Vetting"
-        direction TB
-        Start --> API[Backend API]
-        API --> Parser[1. Parse Resume & Create Embedding]:::agent
-        Parser --> Compliance[2. Scan for Bias]:::agent
-        Compliance --> Vetting[3. Vet in Parallel - GitHub/Web]:::agent
-        Vetting --> Matcher[4. Match to Jobs - FAISS + LLM]:::agent
-        Matcher --> Score[Save Match Score]:::db
+    Start -->|via Google Form or Manual Upload| API[Backend API Endpoint]:::user_interaction
+    API -->|Hands off resume file| Orchestrator[Orchestrator Agent]:::main_agent
+    %% --- Phase 2: Parsing & Embedding ---
+    Orchestrator -->|Task: Parse Resume| Parser[Resume Parsing Agent]:::sub_agent
+    Parser -->|1. Extracts Text & Metadata| Parser
+    Parser -->|Generates Embedding Vector| Embedding[Embedding Model]:::service
+    Parser -->|2. Saves Structured Data| MongoDB[(MongoDB)]:::db
+    Embedding -->|Resume Vector| FAISS[Vector DB - FAISS]:::db
+    Parser -->|3. Saves Vector to FAISS| FAISS
+    Parser -->|Parsed Text, Name, GitHub Link| Orchestrator
+    %% --- Phase 3: Parallel Vetting ---
+    subgraph Parallel_Vetting_Crew[Parallel Vetting Crew]
+        direction LR
+        Orchestrator -->|Task: Vet Candidate| GitHub[GitHub Agent]:::parallel_agent
+        Orchestrator -->|Task: Vet Candidate| Search[Public Search Agent]:::parallel_agent
+        GitHub -->|GitHub Report| Synthesizer[Synthesizer Agent]:::sub_agent
+        Search -->|Public Presence Report| Synthesizer
     end
-
-    Score --> Decision1{Initial Score >= 50?}:::phase_gate
-
-    subgraph "Phase 2: Autonomous AI Interview & Evaluation"
+    Synthesizer -->|Enriched Profile| Orchestrator
+    %% --- Phase 4: Matching (Expanded) ---
+    Orchestrator -->|Parsed Text + Enriched Profile| Matcher[Matching Agent]:::sub_agent
+    
+    subgraph Two_Stage_Matching[Two-Stage Matching Process]
         direction TB
-        Decision1 -- Yes --> Invite[1. Send AI Interview Invite]:::agent
-        Invite --> Interview[2. Candidate Takes AI Interview]
-        Interview --> Evaluation[3. Evaluate Transcript & Score]:::agent
-        Evaluation --> InterviewScore[Save Interview Score]:::db
+        Matcher -->|1. Vector Search| FAISS
+        FAISS -->|Returns Top 5 Similar Jobs| Matcher
+        Matcher -->|2. LLM Evaluation| LLM[LLM - Groq]:::service
+        LLM -->|Expert scoring against Top 5| LLM
+        LLM -->|Returns Final Nuanced Score| Matcher
     end
-
-    InterviewScore --> Decision2{Final Score >= 70?}:::phase_gate
-
-    subgraph "Phase 3: Final Decision & Communication"
-        direction TB
-        Decision2 -- Yes --> Hire[Send Next Steps Email]:::agent
-        Decision2 -- No --> FinalReject[Send Final Rejection Email]:::agent
-    end
-
-    Decision1 -- No --> InitialReject[Send Initial Rejection Email]:::agent
-
-    InitialReject --> End((Process Ends)):::start_end
-    Hire --> End
+    Matcher -->|Final Match Score| Orchestrator
+    Matcher -->|Saves Final Score to| MongoDB
+    %% --- Phase 5: Decision & Interview ---
+    Orchestrator -->|Makes Decision| Decision{Score >= 50?}
+    Decision -->|No| RejectEmail[Send Rejection Email]:::sub_agent
+    Decision -->|Yes| Shortlist[Shortlist for AI Interview]
+    Shortlist -->|Create Interview Record| CreateInterview[Interview Record in DB]:::db
+    CreateInterview --> InviteEmail[Send Interview Invite Email]:::sub_agent
+    InviteEmail -->|Contains Link| InterviewUI[Candidate Enters AI Interview Room]:::user_interaction
+    %% --- Phase 6: AI Interview ---
+    InterviewUI -->|WebSocket Connection| Interviewer[Interview Agent]:::sub_agent
+    Interviewer -->|Conducts Interview using| LLM
+    Interviewer -->|Uses| STT[Speech-to-Text Service]:::service
+    Interviewer -->|Interview Transcript| LLM
+    LLM -->|Final Score & Summary| Interviewer
+    Interviewer -->|Saves Score & Evaluation| MongoDB
+    %% --- Phase 7: Final Verdict ---
+    Interviewer -->|Interview Complete| Orchestrator
+    Orchestrator -->|Makes Final Decision| FinalDecision{Interview Score >= 70?}
+    FinalDecision -->|No| FinalReject[Send Final Rejection Email]:::sub_agent
+    FinalDecision -->|Yes| Hire[Send Next Steps Email]:::sub_agent
+    %% --- End Points ---
+    RejectEmail --> End((Process Ends)):::start_end
     FinalReject --> End
+    Hire --> End
 ```
 
 ---
@@ -266,15 +300,9 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 👥 Authors
 
-- **Your Name** - *Initial work* - [YourGitHub](https://github.com/your-username)
+- **Deepesh Yadav** - *Initial work* - [YourGitHub](https://github.com/deepeshyadav760)
 
 ---
 
