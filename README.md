@@ -41,15 +41,6 @@ A fully functional, production-ready AI recruiting system powered by multi-agent
 
 ## 📊 System Workflow
 ```mermaid
-# AI-Powered Recruitment System
-
-## System Architecture Overview
-
-This document outlines the complete workflow of our AI-powered recruitment system, from candidate application to final hiring decision.
-
-## Process Flow Diagram
-
-```mermaid
 graph TD
     %% === Node Classes ===
     classDef start_end fill:#f96,stroke:#333,stroke-width:2px;
