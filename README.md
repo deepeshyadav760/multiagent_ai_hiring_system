@@ -2,14 +2,17 @@
 
 A fully functional, production-ready AI recruiting system powered by multi-agent architecture, featuring automated resume parsing, intelligent candidate matching, interview scheduling, and compliance monitoring.
 
-<img width="1919" height="860" alt="image" src="https://github.com/user-attachments/assets/d383f9ff-268a-420b-a0aa-101bde4fd3a5" /> <img width="1919" height="854" alt="image" src="https://github.com/user-attachments/assets/96d29980-7b13-409c-b04c-d53d623cb4d9" />  <img width="1919" height="867" alt="image" src="https://github.com/user-attachments/assets/ec0f5fc3-94c9-42dd-a9ac-564896ab3030" /> ![Uploading image.png…]()  ![Uploading image.png…]()  ![Uploading image.png…]()  ![Uploading image.png…]()
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/5999e17f-bf87-4802-8444-1f3e1974ee64" width="30%" />
+  <img src="https://github.com/user-attachments/assets/d1c9932c-0ec8-45ac-b450-5d509b672a93" width="30%" />
+  <img src="https://github.com/user-attachments/assets/0e3253fb-e96c-4e27-a782-1feb56bdb9bd" width="30%" />
+</div>
 
-
-
-
-
-
-
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/2a4695fc-eaff-45db-b102-bf0fc42b38a9" width="30%" />
+  <img src="https://github.com/user-attachments/assets/1867c808-dea5-4f62-b477-19a097697c9e" width="30%" />
+  <img src="https://github.com/user-attachments/assets/a763c329-91e2-4d58-b2c0-7649f2017748" width="30%" />
+</div>
 
 ## 🏗️ Architecture
 
