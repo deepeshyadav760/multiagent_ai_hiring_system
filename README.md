@@ -1,6 +1,8 @@
 # AI-Powered Recruiting & Talent Screening System
 
-A fully functional, production-ready AI recruiting system powered by multi-agent architecture, featuring automated resume parsing, intelligent candidate matching, interview scheduling, and compliance monitoring.
+An autonomous, multi-agent platform for end-to-end technical recruitment, featuring AI-powered matching, proactive sourcing, and automated, proctored interviews.
+
+This project demonstrates a full-stack application that leverages a crew of specialized AI agents, built with CrewAI, to automate the entire hiring lifecycle. From resume ingestion and intelligent scoring to conducting real-time conversational interviews, this system is designed to make recruiting faster, fairer, and more insightful.
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/5999e17f-bf87-4802-8444-1f3e1974ee64" width="30%" />
@@ -293,7 +295,7 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 ## 👥 Authors
 
-- **Deepesh Yadav** - *Initial work* - [YourGitHub](https://github.com/deepeshyadav760)
+- **Deepesh Yadav** - [MyGitHub](https://github.com/deepeshyadav760)
 
 ---
 
