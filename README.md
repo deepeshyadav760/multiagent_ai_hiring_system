@@ -2,6 +2,15 @@
 
 A fully functional, production-ready AI recruiting system powered by multi-agent architecture, featuring automated resume parsing, intelligent candidate matching, interview scheduling, and compliance monitoring.
 
+<img width="1919" height="860" alt="image" src="https://github.com/user-attachments/assets/d383f9ff-268a-420b-a0aa-101bde4fd3a5" /> <img width="1919" height="854" alt="image" src="https://github.com/user-attachments/assets/96d29980-7b13-409c-b04c-d53d623cb4d9" />  <img width="1919" height="867" alt="image" src="https://github.com/user-attachments/assets/ec0f5fc3-94c9-42dd-a9ac-564896ab3030" /> ![Uploading image.png…]()  ![Uploading image.png…]()  ![Uploading image.png…]()  ![Uploading image.png…]()
+
+
+
+
+
+
+
+
 ## 🏗️ Architecture
 
 ### Multi-Agent System (Hierarchical Pattern)
