@@ -172,7 +172,7 @@
 
 # tools/database_tool.py
 
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 from typing import Dict, Any, List, Optional
 from database.mongodb_client import mongodb_sync
 from datetime import datetime
@@ -344,7 +344,8 @@ class DatabaseTool(BaseTool):
         """Save interview record"""
         interview_data['created_at'] = datetime.utcnow()
         interview_data['updated_at'] = datetime.utcnow()
-        interview_data['status'] = 'scheduled'
+        # THIS IS THE PROBLEM:
+        interview_data['status'] = 'scheduled' # It always sets the status to "scheduled"
         
         return self._run(
             action="insert",

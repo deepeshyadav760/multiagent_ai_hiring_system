@@ -1,5 +1,5 @@
 # Tool: RAG/Vector search
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 from typing import Dict, Any, List
 from database.vector_store import vector_store
 from llm.embeddings import embedding_model

@@ -96,28 +96,28 @@ function startProctoring() {
         }
         isDetecting = true; // Set the flag
 
-        try {
-            const detections = await faceapi.detectAllFaces(webcamEl, new faceapi.TinyFaceDetectorOptions());
+        // try {
+        //     const detections = await faceapi.detectAllFaces(webcamEl, new faceapi.TinyFaceDetectorOptions());
             
-            // --- Proctoring Rules ---
-            if (detections.length === 0) {
-                // To avoid flickering, only update the status if it's different
-                if (!statusEl.innerHTML.includes("No person detected")) {
-                    statusEl.innerHTML = "<strong style='color: red;'>Warning: No person detected. Please stay in frame.</strong>";
-                }
-            } else if (detections.length > 1) {
-                if (!statusEl.innerHTML.includes("Multiple people detected")) {
-                    statusEl.innerHTML = "<strong style='color: red;'>Warning: Multiple people detected. Please ensure you are alone.</strong>";
-                }
-            }
-            // If all is well, the status will be updated by handleServerMessage,
-            // so we don't need an 'else' block here.
+        //     // --- Proctoring Rules ---
+        //     if (detections.length === 0) {
+        //         // To avoid flickering, only update the status if it's different
+        //         if (!statusEl.innerHTML.includes("No person detected")) {
+        //             statusEl.innerHTML = "<strong style='color: red;'>Warning: No person detected. Please stay in frame.</strong>";
+        //         }
+        //     } else if (detections.length > 1) {
+        //         if (!statusEl.innerHTML.includes("Multiple people detected")) {
+        //             statusEl.innerHTML = "<strong style='color: red;'>Warning: Multiple people detected. Please ensure you are alone.</strong>";
+        //         }
+        //     }
+        //     // If all is well, the status will be updated by handleServerMessage,
+        //     // so we don't need an 'else' block here.
 
-        } catch (error) {
-            console.error("Error during face detection:", error);
-        } finally {
-            isDetecting = false; // Release the flag, allowing the next run
-        }
+        // } catch (error) {
+        //     console.error("Error during face detection:", error);
+        // } finally {
+        //     isDetecting = false; // Release the flag, allowing the next run
+        // }
         
     }, 2500); // Increased interval to 2.5 seconds for better performance
 }
@@ -147,7 +147,7 @@ function startInterviewTimer(duration) {
 function setupWebSocket(stream) {
     // IMPORTANT: Replace this with your LOCALHOST, NGROK, or deployed RENDER URL
     const socketUrl = `ws://localhost:8000/ws/interview/${interviewId}`;
-    // const socketUrl = `wss://your-backend-url.onrender.com/ws/interview/${interviewId}`;
+    // const socketUrl = `wss://aa2a6c0dced5.ngrok-free.app/ws/interview/${interviewId}`;
 
     socket = new WebSocket(socketUrl);
     
@@ -166,7 +166,9 @@ function setupWebSocket(stream) {
     };
 }
 
+
 function handleServerMessage(data, stream) {
+    // Show the AI's message or the error message
     statusEl.innerHTML = `<strong>AI:</strong> ${data.text}`;
 
     switch(data.type) {
@@ -174,30 +176,31 @@ function handleServerMessage(data, stream) {
         case "status":
             const utterance = new SpeechSynthesisUtterance(data.text);
             window.speechSynthesis.speak(utterance);
-            
             utterance.onend = () => {
-                if (data.type === "question") {
-                    startRecording(stream);
-                }
+                if (data.type === "question") startRecording(stream);
             };
             break;
-        
         case "thank_you":
             const thankYouUtterance = new SpeechSynthesisUtterance(data.text);
             window.speechSynthesis.speak(thankYouUtterance);
             thankYouUtterance.onend = () => {
-                setTimeout(() => {
-                    if (socket && socket.readyState === WebSocket.OPEN) socket.close();
-                }, 4000);
+                setTimeout(() => { if (socket && socket.readyState === WebSocket.OPEN) socket.close(); }, 4000);
             };
+            break;
+        
+        // This case will now handle the "invalid link" error
+        case "error":
+            // Make the error text red to draw attention
+            statusEl.innerHTML = `<strong style="color: red;">Error: ${data.text}</strong>`;
+            stopEverything();
             break;
 
         case "complete":
-        case "error":
             stopEverything();
             break;
     }
 }
+
 
 function startRecording(stream) {
     mediaRecorder = new MediaRecorder(stream);

@@ -1,5 +1,5 @@
 # Tool: Parse resume files
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 from typing import Dict, Any
 import PyPDF2
 import docx

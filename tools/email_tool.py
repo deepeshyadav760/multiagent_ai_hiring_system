@@ -1,5 +1,5 @@
 # Tool: Email sending
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 from typing import Dict, Any, List, Optional
 import smtplib
 from email.mime.text import MIMEText

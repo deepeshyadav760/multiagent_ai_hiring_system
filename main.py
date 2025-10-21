@@ -103,11 +103,15 @@ async def interview_websocket(websocket: WebSocket, interview_id: str):
     
     connection_closed = False
     try:
+        # 1. Fetch the interview from the database
         interview = database_tool.get_interview_by_id(interview_id)
+        
+        # 2. Check the status of the interview
         if not interview or interview.get("status") != "pending_ai_interview":
+            # If the interview doesn't exist OR its status is something else
+            # (like "completed_ai_interview"), then do this:
             await websocket.send_json({"type": "error", "text": "This interview link is invalid or has already been completed."})
             await websocket.close()
-            connection_closed = True
             return
 
         # 1. Start session, get the opening question
@@ -202,29 +206,40 @@ async def health_check():
     }
 
 
+### FIX: Updated the /stats endpoint to correctly report the vector count ###
 @app.get("/stats")
 async def get_stats():
-    """Get system statistics"""
+    """Get high-level system statistics for the dashboard."""
     try:
+        # Get counts from MongoDB collections
         candidates_count = await mongodb.db.candidates.count_documents({})
         jobs_count = await mongodb.db.jobs.count_documents({})
         interviews_count = await mongodb.db.interviews.count_documents({})
         
+        # Import the vector_store instance directly
         from database.vector_store import vector_store
-        vector_stats = vector_store.get_stats()
         
+        # --- The Fix ---
+        # Instead of calling get_stats(), we directly access the `ntotal` property
+        # of the FAISS index object, which is guaranteed to be correct.
+        vector_count = 0
+        if vector_store.index:
+            vector_count = vector_store.index.ntotal
+        
+        log.info(f"Fetching stats: Candidates={candidates_count}, Jobs={jobs_count}, Interviews={interviews_count}, Vectors={vector_count}")
+
         return {
             "success": True,
             "stats": {
                 "total_candidates": candidates_count,
                 "active_jobs": jobs_count,
                 "interviews_scheduled": interviews_count,
-                "vector_count": vector_stats.get("vector_count", 0)
+                "vector_count": vector_count # Pass the correct number to the frontend
             }
         }
     except Exception as e:
         log.error(f"Error fetching stats: {e}")
-        return {"success": False, "error": str(e), "stats": {}}
+        raise HTTPException(status_code=500, detail="Could not fetch system statistics.")
 
 
 @app.get("/agents/status")

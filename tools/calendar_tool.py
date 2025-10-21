@@ -1,4 +1,4 @@
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 from typing import Dict, Any, List
 from datetime import datetime, timedelta
 from utils.logger import log

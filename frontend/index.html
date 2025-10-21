@@ -169,8 +169,11 @@
             <!-- Jobs Tab -->
             <div id="jobs-tab" class="tab-content">
                 <div class="tab-header">
-                    <h2>Job Postings</h2>
-                    <span class="tab-count" id="jobs-count">0 total</span>
+                    <div>
+                        <h2>Job Postings</h2>
+                        <span class="tab-count" id="jobs-count">0 total</span>
+                    </div>
+                    <button class="action-btn" id="post-job-btn">Post New Job</button>
                 </div>
                 <div id="jobs-container" class="items-container"></div>
             </div>
@@ -187,13 +190,55 @@
             <!-- Interviews Tab -->
             <div id="interviews-tab" class="tab-content">
                 <div class="tab-header">
-                    <h2>Scheduled Interviews</h2>
-                    <span class="tab-count" id="interviews-count">0 total</span>
+                    <div>
+                        <h2>Scheduled Interviews</h2>
+                        <span class="tab-count" id="interviews-count">0 total</span>
+                    </div>
+                    <div class="tab-controls">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #4b5563;">
+                            <span>Show Completed</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="show-completed-interviews-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
                 </div>
                 <div id="interviews-container" class="items-container"></div>
             </div>
         </div>
     </main>
+
+    <!-- Post Job Modal -->
+    <div id="post-job-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="close-btn" id="close-modal-btn">&times;</button>
+            <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 700;">Post New Job</h2>
+            <form id="post-job-form">
+                <div class="form-group">
+                    <label for="job-title">Job Title</label>
+                    <input type="text" id="job-title" required placeholder="e.g., Senior Software Engineer">
+                </div>
+                <div class="form-group">
+                    <label for="job-location">Location</label>
+                    <input type="text" id="job-location" required placeholder="e.g., San Francisco, CA">
+                </div>
+                <div class="form-group">
+                    <label for="employment-type">Employment Type</label>
+                    <input type="text" id="employment-type" required placeholder="e.g., Full-time">
+                </div>
+                <div class="form-group">
+                    <label for="job-description">Description</label>
+                    <textarea id="job-description" rows="4" required placeholder="Enter job description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="required-skills">Required Skills (comma-separated)</label>
+                    <input type="text" id="required-skills" required placeholder="e.g., Python, React, SQL">
+                </div>
+                <button type="submit" class="submit-btn">Post Job</button>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
