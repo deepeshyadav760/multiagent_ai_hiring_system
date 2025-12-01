@@ -43,93 +43,72 @@ This project demonstrates a full-stack application that leverages a crew of spec
 
 ## 📊 System Workflow
 ```mermaid
----
-config:
-  layout: elk
----
-flowchart TB
- subgraph Parallel_Vetting_Crew["Parallel Vetting Crew"]
-    direction LR
-        GitHub["GitHub Agent"]
-        Orchestrator["Orchestrator Agent"]
-        Search["Public Search Agent"]
-        Synthesizer["Synthesizer Agent"]
-  end
- subgraph Two_Stage_Matching["Two-Stage Matching Process"]
-    direction TB
-        FAISS["Vector DB - FAISS"]
-        Matcher["Matching Agent"]
-        LLM["LLM - Groq"]
-  end
-    Start(("Start: Candidate Applies")) -- via Google Form or Manual Upload --> API["Backend API Endpoint"]
-    API -- Hands off resume file --> Orchestrator
-    Orchestrator -- Task: Parse Resume --> Parser["Resume Parsing Agent"]
-    Parser -- "1. Extracts Text & Metadata" --> Parser
-    Parser -- Generates Embedding Vector --> Embedding["Embedding Model"]
-    Parser -- "2. Saves Structured Data" --> MongoDB[("MongoDB")]
-    Embedding -- Resume Vector --> FAISS
-    Parser -- "3. Saves Vector to FAISS" --> FAISS
-    Parser -- Parsed Text, Name, GitHub Link --> Orchestrator
-    Orchestrator -- Task: Vet Candidate --> GitHub & Search
-    GitHub -- GitHub Report --> Synthesizer
-    Search -- Public Presence Report --> Synthesizer
-    Synthesizer -- Enriched Profile --> Orchestrator
-    Orchestrator -- Parsed Text + Enriched Profile --> Matcher
-    Matcher -- "1. Vector Search" --> FAISS
-    FAISS -- Returns Top 5 Similar Jobs --> Matcher
-    Matcher -- "2. LLM Evaluation" --> LLM
-    LLM -- Expert scoring against Top 5 --> LLM
-    LLM -- Returns Final Nuanced Score --> Matcher
-    Matcher -- Final Match Score --> Orchestrator
-    Matcher -- Saves Final Score to --> MongoDB
-    Orchestrator -- Makes Decision --> Decision{"Score >= 50?"}
-    Decision -- No --> RejectEmail["Send Rejection Email"]
-    Decision -- Yes --> Shortlist["Shortlist for AI Interview"]
-    Shortlist -- Create Interview Record --> CreateInterview["Interview Record in DB"]
-    CreateInterview --> InviteEmail["Send Interview Invite Email"]
-    InviteEmail -- Contains Link --> InterviewUI["Candidate Enters AI Interview Room"]
-    InterviewUI -- WebSocket Connection --> Interviewer["Interview Agent"]
-    Interviewer -- Conducts Interview using --> LLM
-    Interviewer -- Uses --> STT["Speech-to-Text Service"]
-    Interviewer -- Interview Transcript --> LLM
-    LLM -- Final Score & Summary --> Interviewer
-    Interviewer -- Saves Score & Evaluation --> MongoDB
-    Interviewer -- Interview Complete --> Orchestrator
-    Orchestrator -- Makes Final Decision --> FinalDecision{"Interview Score >= 70?"}
-    FinalDecision -- No --> FinalReject["Send Final Rejection Email"]
-    FinalDecision -- Yes --> Hire["Send Next Steps Email"]
-    RejectEmail --> End(("Process Ends"))
+graph TD
+    %% === Node Classes ===
+    classDef start_end fill:#f96,stroke:#333,stroke-width:2px;
+    classDef user_interaction fill:#ccf,stroke:#333,stroke-width:2px;
+    classDef main_agent fill:#fec,stroke:#333,stroke-width:2px;
+    classDef sub_agent fill:#cfc,stroke:#333,stroke-width:2px;
+    classDef parallel_agent fill:#9cf,stroke:#333,stroke-width:2px;
+    classDef db fill:#e9e,stroke:#333,stroke-width:2px;
+    classDef service fill:#f9f,stroke:#333,stroke-width:2px;
+    %% --- Phase 1: Application ---
+    Start((Start: Candidate Applies)):::start_end
+    Start -->|via Google Form or Manual Upload| API[Backend API Endpoint]:::user_interaction
+    API -->|Hands off resume file| Orchestrator[Orchestrator Agent]:::main_agent
+    %% --- Phase 2: Parsing & Embedding ---
+    Orchestrator -->|Task: Parse Resume| Parser[Resume Parsing Agent]:::sub_agent
+    Parser -->|1. Extracts Text & Metadata| Parser
+    Parser -->|Generates Embedding Vector| Embedding[Embedding Model]:::service
+    Parser -->|2. Saves Structured Data| MongoDB[(MongoDB)]:::db
+    Embedding -->|Resume Vector| FAISS[Vector DB - FAISS]:::db
+    Parser -->|3. Saves Vector to FAISS| FAISS
+    Parser -->|Parsed Text, Name, GitHub Link| Orchestrator
+    %% --- Phase 3: Parallel Vetting ---
+    subgraph Parallel_Vetting_Crew[Parallel Vetting Crew]
+        direction LR
+        Orchestrator -->|Task: Vet Candidate| GitHub[GitHub Agent]:::parallel_agent
+        Orchestrator -->|Task: Vet Candidate| Search[Public Search Agent]:::parallel_agent
+        GitHub -->|GitHub Report| Synthesizer[Synthesizer Agent]:::sub_agent
+        Search -->|Public Presence Report| Synthesizer
+    end
+    Synthesizer -->|Enriched Profile| Orchestrator
+    %% --- Phase 4: Matching (Expanded) ---
+    Orchestrator -->|Parsed Text + Enriched Profile| Matcher[Matching Agent]:::sub_agent
+    
+    subgraph Two_Stage_Matching[Two-Stage Matching Process]
+        direction TB
+        Matcher -->|1. Vector Search| FAISS
+        FAISS -->|Returns Top 5 Similar Jobs| Matcher
+        Matcher -->|2. LLM Evaluation| LLM[LLM - Groq]:::service
+        LLM -->|Expert scoring against Top 5| LLM
+        LLM -->|Returns Final Nuanced Score| Matcher
+    end
+    Matcher -->|Final Match Score| Orchestrator
+    Matcher -->|Saves Final Score to| MongoDB
+    %% --- Phase 5: Decision & Interview ---
+    Orchestrator -->|Makes Decision| Decision{Score >= 50?}
+    Decision -->|No| RejectEmail[Send Rejection Email]:::sub_agent
+    Decision -->|Yes| Shortlist[Shortlist for AI Interview]
+    Shortlist -->|Create Interview Record| CreateInterview[Interview Record in DB]:::db
+    CreateInterview --> InviteEmail[Send Interview Invite Email]:::sub_agent
+    InviteEmail -->|Contains Link| InterviewUI[Candidate Enters AI Interview Room]:::user_interaction
+    %% --- Phase 6: AI Interview ---
+    InterviewUI -->|WebSocket Connection| Interviewer[Interview Agent]:::sub_agent
+    Interviewer -->|Conducts Interview using| LLM
+    Interviewer -->|Uses| STT[Speech-to-Text Service]:::service
+    Interviewer -->|Interview Transcript| LLM
+    LLM -->|Final Score & Summary| Interviewer
+    Interviewer -->|Saves Score & Evaluation| MongoDB
+    %% --- Phase 7: Final Verdict ---
+    Interviewer -->|Interview Complete| Orchestrator
+    Orchestrator -->|Makes Final Decision| FinalDecision{Interview Score >= 70?}
+    FinalDecision -->|No| FinalReject[Send Final Rejection Email]:::sub_agent
+    FinalDecision -->|Yes| Hire[Send Next Steps Email]:::sub_agent
+    %% --- End Points ---
+    RejectEmail --> End((Process Ends)):::start_end
     FinalReject --> End
     Hire --> End
-
-     Start:::start_end
-     API:::user_interaction
-     Orchestrator:::main_agent
-     Parser:::sub_agent
-     Embedding:::service
-     MongoDB:::db
-     FAISS:::db
-     GitHub:::parallel_agent
-     Search:::parallel_agent
-     Synthesizer:::sub_agent
-     Matcher:::sub_agent
-     LLM:::service
-     RejectEmail:::sub_agent
-     CreateInterview:::db
-     InviteEmail:::sub_agent
-     InterviewUI:::user_interaction
-     Interviewer:::sub_agent
-     STT:::service
-     FinalReject:::sub_agent
-     Hire:::sub_agent
-     End:::start_end
-    classDef start_end fill:#f96,stroke:#333,stroke-width:2px
-    classDef user_interaction fill:#ccf,stroke:#333,stroke-width:2px
-    classDef main_agent fill:#fec,stroke:#333,stroke-width:2px
-    classDef sub_agent fill:#cfc,stroke:#333,stroke-width:2px
-    classDef parallel_agent fill:#9cf,stroke:#333,stroke-width:2px
-    classDef db fill:#e9e,stroke:#333,stroke-width:2px
-    classDef service fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
 ---
