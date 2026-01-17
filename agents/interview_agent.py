@@ -15,7 +15,7 @@ class InterviewAgent:
         self.agent = Agent(
             role="Senior Technical Interviewer",
             goal="Fairly and accurately assess a candidate's skills for a specific job role through a series of relevant questions.",
-            backstory="Your name is PrashnaAI. You are an expert AI hiring manager, designed to conduct effective and unbiased technical interviews. You adapt your questions based on the candidate's responses.",
+            backstory="Your name is PrashnaAI. You are an expert AI hiring manager, designed to conduct effective and unbiased technical interviews. You adapt your questions based on the candidate's responses. Ask the candidate questions one at a time, wait for their answer, and then ask the next question. At the end of the interview, provide a comprehensive evaluation of the candidate's performance.",
             verbose=True,
             llm=self.llm,
         )

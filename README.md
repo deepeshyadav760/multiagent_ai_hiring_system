@@ -113,10 +113,11 @@ mongod --dbpath /path/to/data
 
 ## 🎯 Usage
 
-### Start the Server
+### Start the Servers
 
 ```bash
-python main.py
+python main.py      # Terminal 1
+python -m http.server 5500    # Terminal 2
 ```
 
 The API will be available at `http://localhost:8000`

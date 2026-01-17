@@ -94,31 +94,7 @@ function startProctoring() {
         if (isDetecting || !webcamEl.srcObject) {
             return;
         }
-        isDetecting = true; // Set the flag
-
-        // try {
-        //     const detections = await faceapi.detectAllFaces(webcamEl, new faceapi.TinyFaceDetectorOptions());
-            
-        //     // --- Proctoring Rules ---
-        //     if (detections.length === 0) {
-        //         // To avoid flickering, only update the status if it's different
-        //         if (!statusEl.innerHTML.includes("No person detected")) {
-        //             statusEl.innerHTML = "<strong style='color: red;'>Warning: No person detected. Please stay in frame.</strong>";
-        //         }
-        //     } else if (detections.length > 1) {
-        //         if (!statusEl.innerHTML.includes("Multiple people detected")) {
-        //             statusEl.innerHTML = "<strong style='color: red;'>Warning: Multiple people detected. Please ensure you are alone.</strong>";
-        //         }
-        //     }
-        //     // If all is well, the status will be updated by handleServerMessage,
-        //     // so we don't need an 'else' block here.
-
-        // } catch (error) {
-        //     console.error("Error during face detection:", error);
-        // } finally {
-        //     isDetecting = false; // Release the flag, allowing the next run
-        // }
-        
+        isDetecting = true; // Set the flag 
     }, 2500); // Increased interval to 2.5 seconds for better performance
 }
 
