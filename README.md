@@ -6,7 +6,18 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248.svg)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-A **production-ready, enterprise-grade AI recruiting system** powered by a sophisticated multi-agent architecture. This system automates the entire recruitment pipeline from resume screening to interview scheduling, leveraging advanced LLMs, semantic search, and intelligent automation.
+A **production-ready, enterprise-grade AI recruiting system** powered by a sophisticated multi-agent architecture. This system automates the entire recruitment pipeline from resume screening to interview scheduling, leveraging advanced LLMs, semantic search, and intelligent automation.'
+
+<img width="1569" height="831" alt="image" src="https://github.com/user-attachments/assets/1ae46fa9-f073-4be5-acfc-54d926ba3a81" /> 
+<img width="1532" height="856" alt="image" src="https://github.com/user-attachments/assets/67a9cd41-2101-4915-b801-935f60d349a9" />
+<img width="1622" height="899" alt="image" src="https://github.com/user-attachments/assets/88c3de34-6c87-4843-ae66-3a74076d32d5" />
+<img width="1502" height="870" alt="image" src="https://github.com/user-attachments/assets/c42c707f-e83f-4a73-be45-87da250e3373" />
+<img width="1305" height="910" alt="image" src="https://github.com/user-attachments/assets/6898402f-b038-4e01-a17b-79797b7fe353" />
+<img width="1297" height="864" alt="image" src="https://github.com/user-attachments/assets/08815f49-f748-479c-940f-d03acabacf2d" />
+<img width="1270" height="870" alt="image" src="https://github.com/user-attachments/assets/acac0220-e053-4396-8aab-bd297db14f84" />
+<img width="1311" height="820" alt="image" src="https://github.com/user-attachments/assets/57ce44fd-f0d7-4101-8965-953b77d4d5e9" />
+<img width="1301" height="870" alt="image" src="https://github.com/user-attachments/assets/a1cba78e-ffa1-4112-9237-11af395bb933" />
+
 
 ## 📋 Table of Contents
 
