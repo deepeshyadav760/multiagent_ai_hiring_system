@@ -34,12 +34,14 @@ class ResumeParserTool(BaseTool):
             # Extract basic contact info with regex
             email = self._extract_email(text)
             phone = self._extract_phone(text)
+            github_url = self._extract_github_url(text)
             
             # Combine results
             result = {
                 "resume_text": text,
                 "email": email or parsed_data.get("email", ""),
                 "phone": phone or parsed_data.get("phone", ""),
+                "github_url": github_url or parsed_data.get("github_url", ""),
                 "name": parsed_data.get("name", ""),
                 "skills": parsed_data.get("skills", []),
                 "experience_years": parsed_data.get("experience_years", 0),
@@ -94,6 +96,18 @@ class ResumeParserTool(BaseTool):
         phone_pattern = r'(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
         matches = re.findall(phone_pattern, text)
         return matches[0] if matches else ""
+    
+    def _extract_github_url(self, text: str) -> str:
+        """Extract GitHub profile URL using regex"""
+        # Pattern matches: github.com/username or https://github.com/username
+        github_pattern = r'(?:https?://)?(?:www\.)?github\.com/([a-zA-Z0-9_-]+)(?:/)?'
+        matches = re.findall(github_pattern, text, re.IGNORECASE)
+        
+        if matches:
+            # Return full URL format
+            username = matches[0]
+            return f"https://github.com/{username}"
+        return ""
     
     def _parse_with_llm(self, text: str) -> Dict[str, Any]:
         """Use LLM to parse resume text"""

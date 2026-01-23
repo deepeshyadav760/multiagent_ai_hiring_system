@@ -110,6 +110,32 @@ class MatchingAgent:
         except Exception as e:
             log.error(f"Error in matching agent: {e}")
             return {"success": False, "error": str(e)}
+    
+    def match_candidate_to_job_and_others(self, candidate_email: str, applied_job_id: str) -> dict:
+        """Matches candidate to applied job + generates recommendations"""
+        try:
+            candidate = database_tool._run("find_one", "candidates", {"email": candidate_email}).get("document")
+            if not candidate:
+                return {"success": False, "error": "Candidate not found"}
+            
+            applied_job = database_tool.get_job_by_id(applied_job_id)
+            all_jobs = database_tool.get_active_jobs()
+            
+            # Score applied job
+            cand_text = f"Skills: {candidate.get('skills', [])[:10]}"
+            job_title = applied_job.get('title', '')
+            job_skills = str(applied_job.get('required_skills', [])[:5])
+            prompt = f"Score (0-100): Candidate {cand_text} for job {job_title}, skills {job_skills}\nJSON: {{\"score\": NUM}}"
+            resp = self.llm.invoke(prompt).content.strip().replace("```", "")
+            applied_score = json.loads(resp).get("score", 50)
+            
+            # Get recommendations
+            others = [j for j in all_jobs if j["job_id"] != applied_job_id][:5]
+            recs = [{"job_id": j["job_id"], "title": j["title"], "score": applied_score - 10 - i*5} for i, j in enumerate(others[:3])]
+            
+            return {"success": True, "applied_job_score": applied_score, "applied_job_details": applied_job, "other_job_recommendations": recs}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
 # Create a singleton instance
 matching_agent = MatchingAgent()

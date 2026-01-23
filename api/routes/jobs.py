@@ -8,6 +8,7 @@ from typing import List, Optional
 from models.job_posting import JobPostingCreate, JobPostingUpdate, JobPostingResponse
 from tools.database_tool import database_tool
 from tools.vector_search_tool import vector_search_tool
+from agents.sourcing_agent import sourcing_agent
 from utils.logger import log
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -39,6 +40,15 @@ async def create_job(job: JobPostingCreate):
             required_skills=job_data["required_skills"]
         )
         log.info(f"Job created: {job_data['job_id']}")
+        
+        # NEW: Trigger sourcing agent to find past candidates
+        try:
+            log.info(f"Triggering sourcing agent for new job: {job_data['job_id']}")
+            sourcing_agent.find_and_engage_past_candidates(job_data["job_id"])
+        except Exception as sourcing_error:
+            log.warning(f"Sourcing agent failed for job {job_data['job_id']}: {sourcing_error}")
+            # Don't fail job creation if sourcing fails
+        
         return {
             "success": True,
             "job_id": job_data["job_id"],

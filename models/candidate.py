@@ -73,3 +73,13 @@ class CandidateResponse(BaseModel):
     status: str
     uploaded_at: datetime
     matched_jobs: List[str] = []
+    
+    # Enrichment fields (GitHub + Public Presence)
+    github_url: Optional[str] = None
+    github_analysis: Optional[Dict] = None
+    enriched_profile: Optional[str] = None
+    public_presence: Optional[str] = None
+    
+    class Config:
+        # Allow extra fields that might exist in DB but not defined here
+        extra = 'allow'

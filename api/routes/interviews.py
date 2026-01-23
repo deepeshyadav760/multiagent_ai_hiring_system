@@ -185,29 +185,48 @@ async def send_interview_reminder(interview_id: str):
 
 @router.delete("/{interview_id}", response_model=dict)
 async def cancel_interview(interview_id: str):
-    """Cancel an interview"""
+    """Cancel/Delete an interview"""
     try:
+        # Try finding by direct ID first (could be string UUID or MongoDB ObjectId string)
+        query = {"_id": interview_id}
+        
+        # If the database tool supports intelligent ID handling (which it does), 
+        # we can just pass the string. The tool converts to ObjectId if needed.
+        
         result = database_tool._run(
-            action="update",
+            action="delete",
             collection="interviews",
-            query={"_id": interview_id},
-            data={"status": "cancelled"}
+            query=query
         )
         
-        if result.get("matched_count", 0) == 0:
+        if result.get("deleted_count", 0) == 0:
+            # If not found, try forcing ObjectId conversion just in case the tool didn't catch it
+            # This is a fallback
+            try: 
+                from bson import ObjectId
+                oid = ObjectId(interview_id)
+                result = database_tool._run(
+                    action="delete",
+                    collection="interviews",
+                    query={"_id": oid}
+                )
+            except:
+                pass # Invalid ObjectId, original query failure stands
+
+        if result.get("deleted_count", 0) == 0:
             raise HTTPException(status_code=404, detail="Interview not found")
         
-        log.info(f"Interview cancelled: {interview_id}")
+        log.info(f"Interview deleted: {interview_id}")
         
         return {
             "success": True,
-            "message": "Interview cancelled successfully"
+            "message": "Interview deleted successfully"
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        log.error(f"Error cancelling interview: {e}")
+        log.error(f"Error deleting interview: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

@@ -56,6 +56,7 @@ class ResumeParsingAgent:
                 "name": parsed_data.get("name", "Unknown"),
                 "email": parsed_data.get("email", ""),
                 "phone": parsed_data.get("phone", ""),
+                "github_url": parsed_data.get("github_url", ""),
                 "resume_text": parsed_data.get("resume_text", ""),
                 "skills": parsed_data.get("skills", []),
                 "experience_years": parsed_data.get("experience_years", 0),

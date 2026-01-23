@@ -114,6 +114,7 @@ body {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -176,8 +177,8 @@ body {
 }
 
 @keyframes spin {
-    to { 
-        transform: rotate(360deg); 
+    to {
+        transform: rotate(360deg);
     }
 }
 
@@ -362,42 +363,71 @@ body {
 /* Card Styles */
 .card {
     background: white;
-    border-radius: 0.75rem;
-    padding: 1.25rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.2s ease;
+    border-radius: 1rem;
+    /* More rounded */
+    padding: 1.5rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    /* Subtle shadow */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
 .card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-color: #cbd5e1;
+}
+
+/* Add a subtle top border for flair */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+    opacity: 1;
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .card-title {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #1e293b;
+    color: #0f172a;
+    /* Darker slate */
+    letter-spacing: -0.025em;
 }
 
 .card-subtitle {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     color: #64748b;
     margin-top: 0.25rem;
+    font-weight: 500;
 }
 
 .card-description {
-    font-size: 0.875rem;
-    color: #64748b;
-    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: #475569;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
+    /* Show a bit more text */
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -410,7 +440,8 @@ body {
 
 /* Delete Button Styles */
 .delete-job-btn,
-.delete-interview-btn {
+.delete-interview-btn,
+.delete-candidate-btn {
     background: #fee2e2;
     color: #b91c1c;
     border: none;
@@ -424,16 +455,21 @@ body {
     transition: all 0.2s ease;
     opacity: 0;
     transform: scale(0.8);
+    position: relative;
+    /* Ensure z-index works */
+    z-index: 10;
 }
 
 .card:hover .delete-job-btn,
-.card:hover .delete-interview-btn {
+.card:hover .delete-interview-btn,
+.card:hover .delete-candidate-btn {
     opacity: 1;
     transform: scale(1);
 }
 
 .delete-job-btn:hover,
-.delete-interview-btn:hover {
+.delete-interview-btn:hover,
+.delete-candidate-btn:hover {
     background: #ef4444;
     color: white;
     transform: scale(1.1);
@@ -775,11 +811,11 @@ body {
     border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: #4f46e5;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
     transform: translateX(26px);
 }
 
@@ -788,36 +824,36 @@ input:checked + .slider:before {
     .stats-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .status-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .nav-tabs {
         gap: 1rem;
     }
-    
+
     .nav-tab span {
         display: none;
     }
-    
+
     .tab-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
     }
-    
+
     .meeting-box {
         flex-direction: column;
         gap: 0.75rem;
         text-align: center;
     }
-    
+
     .modal-content {
         width: 95%;
         padding: 1.5rem;
     }
-    
+
     .score-display {
         text-align: right;
     }
@@ -829,7 +865,7 @@ input:checked + .slider:before {
         gap: 1rem;
         align-items: stretch;
     }
-    
+
     .upload-btn {
         justify-content: center;
     }

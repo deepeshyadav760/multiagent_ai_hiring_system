@@ -7,4 +7,28 @@ test_system.py
 /recruit_venv
 
 /logs
-/lang_venv
+
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+lang_venv/
+
+# Uploads & generated files
+uploads/
+*.pdf
+*.zip
+
+# Vector DB / runtime data
+data/faiss_index
+data/*.pkl
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -13,6 +13,9 @@ from agents.resume_parsing_agent import resume_parsing_agent
 from agents.matching_agent import matching_agent
 from agents.communication_agent import communication_agent
 from agents.compliance_agent import compliance_agent
+from agents.github_agent import github_agent
+from agents.public_search_agent import public_search_agent
+from agents.synthesizer_agent import synthesizer_agent
 from tools.database_tool import database_tool
 
 
@@ -52,6 +55,15 @@ class OrchestratorAgent:
             
             candidate_email = parse_result["candidate_email"]
             
+            # NEW: Enrich candidate profile with GitHub + public presence
+            log.info(f"Orchestrator: Enriching candidate profile for {candidate_email}")
+            enrichment_result = self.enrich_candidate_profile(candidate_email)
+            
+            if enrichment_result.get("success"):
+                log.info(f"Enrichment successful. GitHub: {enrichment_result.get('has_github')}, Public: {enrichment_result.get('has_public_presence')}")
+            else:
+                log.warning(f"Enrichment failed, proceeding without: {enrichment_result.get('error', 'Unknown')}")
+            
             self.communication_agent.send_application_confirmation(candidate_email)
             self.compliance_agent.scan_for_bias(candidate_email)
             match_result = self.matching_agent.match_candidate_to_jobs(candidate_email)
@@ -83,6 +95,118 @@ class OrchestratorAgent:
             
         except Exception as e:
             log.error(f"Orchestrator error in application processing: {e}")
+            return {"success": False, "error": str(e)}
+    
+    def enrich_candidate_profile(self, candidate_email: str, job_id: str = None) -> Dict:
+        """
+        Enriches a candidate's profile with GitHub analysis and public presence research.
+        This creates a comprehensive "Enriched Profile" by:
+        1. Analyzing GitHub repositories (if URL exists)
+        2. Searching for public contributions (blogs, articles, talks)
+        3. Synthesizing all data into a comprehensive professional summary
+        
+        Args:
+            candidate_email: Candidate's email
+            job_id: Optional job ID for matching analysis
+            
+        Returns:
+            Enrichment results dictionary
+        """
+        try:
+            log.info(f"Orchestrator: Starting enrichment for candidate {candidate_email}")
+            
+            # Get candidate data
+            candidate_result = database_tool._run(
+                action="find_one",
+                collection="candidates",
+                query={"email": candidate_email}
+            )
+            
+            candidate = candidate_result.get("document")
+            if not candidate:
+                return {"success": False, "error": "Candidate not found"}
+            
+            candidate_name = candidate.get("name", "Candidate")
+            github_url = candidate.get("github_url", "")
+            resume_text = candidate.get("resume_text", "")
+            
+            # Get job requirements if job_id provided
+            job_requirements = None
+            if job_id:
+                job = database_tool.get_job_by_id(job_id)
+                if job:
+                    job_requirements = {
+                        "title": job.get("title", ""),
+                        "required_skills": job.get("required_skills", [])
+                    }
+            
+            # Step 1: GitHub Analysis (if URL exists)
+            github_analysis = None
+            if github_url and github_url.strip():
+                log.info(f"Orchestrator: Running GitHub analysis for {candidate_email}")
+                github_result = github_agent.analyze_profile(github_url, job_requirements)
+                
+                if github_result.get("success"):
+                    github_analysis = github_result
+                    log.info(f"GitHub analysis complete: {github_result.get('professional_summary', 'N/A')[:100]}")
+                else:
+                    log.warning(f"GitHub analysis failed: {github_result.get('message', 'Unknown error')}")
+            else:
+                log.info(f"No GitHub URL found for {candidate_email}, skipping GitHub analysis")
+            
+            # Step 2: Public Presence Search
+            log.info(f"Orchestrator: Searching for public contributions for {candidate_name}")
+            public_presence = public_search_agent.search_for_contributions(candidate_name)
+            
+            # Step 3: Synthesize all data
+            log.info(f"Orchestrator: Synthesizing enriched profile for {candidate_email}")
+            
+            github_report = "No GitHub profile provided."
+            if github_analysis:
+                # Format GitHub analysis as readable text
+                best_repo = github_analysis.get("best_fit_repo", {})
+                github_report = f"""Primary Languages: {', '.join(github_analysis.get('primary_languages', []))}
+Total Repositories: {github_analysis.get('total_repos', 0)}
+Portfolio Quality: {github_analysis.get('portfolio_quality', 'unknown')}
+Total Stars: {github_analysis.get('total_stars', 0)}
+Best Fit Repository: {best_repo.get('name', 'N/A')} ({best_repo.get('url', 'N/A')})
+Reason: {best_repo.get('reason', 'N/A')}
+Professional Summary: {github_analysis.get('professional_summary', 'N/A')}"""
+            
+            enriched_profile = synthesizer_agent.synthesize_reports(
+                resume_text=resume_text[:1000],
+                github_report=github_report,
+                public_presence_report=public_presence
+            )
+            
+            # Step 4: Save enriched data back to candidate record
+            update_data = {
+                "enriched_profile": enriched_profile,
+                "public_presence": public_presence,
+                "updated_at": datetime.utcnow()
+            }
+            
+            if github_analysis:
+                update_data["github_analysis"] = github_analysis
+            
+            database_tool._run(
+                action="update",
+                collection="candidates",
+                query={"email": candidate_email},
+                data=update_data
+            )
+            
+            log.info(f"Orchestrator: Enrichment complete for {candidate_email}")
+            
+            return {
+                "success": True,
+                "enriched_profile": enriched_profile,
+                "has_github": github_analysis is not None,
+                "has_public_presence": bool(public_presence and "No significant" not in public_presence)
+            }
+            
+        except Exception as e:
+            log.error(f"Orchestrator error in enrichment: {e}")
             return {"success": False, "error": str(e)}
     
     def process_candidate_shortlisting(self, candidate_email: str, job_id: str) -> Dict:

@@ -127,6 +127,108 @@
             box-shadow: none;
         }
 
+        /* ✅ NEW: Verification Setup Box */
+        .verification-box {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            border: 2px solid #fdba74;
+            margin-bottom: 1.25rem;
+        }
+
+        .verification-box h4 {
+            color: #9a3412;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .verification-box h4::before {
+            content: "🪪";
+        }
+
+        .verification-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .verification-col {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 2px solid #fed7aa;
+        }
+
+        .verification-col label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #7c2d12;
+            font-size: 0.9rem;
+        }
+
+        .verification-col input[type="file"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+
+        .capture-preview-box {
+            position: relative;
+            width: 100%;
+            padding-top: 70%;
+            background: #0f172a;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 2px solid #fb923c;
+            margin-bottom: 0.75rem;
+        }
+
+        #capture-webcam,
+        #captured-photo-preview {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .mini-btn {
+            width: 100%;
+            padding: 0.65rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: #fb923c;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: 0.2s ease;
+            margin-top: 0.5rem;
+        }
+
+        .mini-btn:hover {
+            background: #f97316;
+        }
+
+        .mini-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .verification-status {
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #9a3412;
+        }
+
         /* Interview UI Styles */
         #interview-ui {
             display: none;
@@ -134,7 +236,7 @@
 
         .timer-container {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .timer {
@@ -153,6 +255,29 @@
         .timer::before {
             content: "⏱️";
             font-size: 1.5rem;
+        }
+
+        /* ✅ NEW: Proctoring Warning Box */
+        #warning-box {
+            display: none;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+        }
+
+        #warning-text {
+            color: #b91c1c;
+            font-weight: 800;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        #warning-count {
+            color: #991b1b;
+            font-weight: 700;
+            font-size: 0.9rem;
         }
 
         .interview-grid {
@@ -263,6 +388,10 @@
                 max-width: 400px;
                 margin: 0 auto;
             }
+
+            .verification-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 640px) {
@@ -308,7 +437,53 @@
                         <li>AI proctoring is enabled to ensure fairness. Please look at the camera and avoid having others in the room.</li>
                     </ul>
                 </div>
-                <button id="start-interview-btn" class="start-btn">Start Setup</button>
+
+                <!-- ✅ NEW: ID Upload + Capture Candidate Photo -->
+                <div class="verification-box">
+                    <h4>Identity Verification (Required)</h4>
+                    <p style="color:#7c2d12; font-size:0.9rem; line-height:1.5;">
+                        Please upload your <b>ID card</b> and capture your <b>live photo</b> before starting the interview.
+                        This is mandatory for verification.
+                    </p>
+
+                    <div class="verification-row">
+                        <!-- ID Upload -->
+                        <div class="verification-col">
+                            <label for="id-card-input">Upload ID Card Photo</label>
+                            <input type="file" id="id-card-input" accept="image/*" />
+                            <p style="font-size:0.85rem; color:#6b7280; margin-top:0.5rem;">
+                                Accepted formats: JPG, PNG
+                            </p>
+                        </div>
+
+                        <!-- Candidate Photo Capture -->
+                        <div class="verification-col">
+                            <label>Capture Your Photo</label>
+                            <div class="capture-preview-box">
+                                <video id="capture-webcam" autoplay muted playsinline></video>
+                                <img id="captured-photo-preview" style="display:none;" alt="Captured photo preview" />
+                            </div>
+
+                            <button id="enable-camera-btn" class="mini-btn" type="button">
+                                🎥 Enable Camera
+                            </button>
+                            
+                            <button id="capture-photo-btn" class="mini-btn" type="button">
+                                📸 Capture Photo
+                            </button>
+
+                            <button id="upload-verification-btn" class="mini-btn" type="button" disabled>
+                                ⬆️ Upload Verification
+                            </button>
+
+                            <div id="verification-status" class="verification-status">
+                                Verification not uploaded yet.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="start-interview-btn" class="start-btn" disabled>Start Setup</button>
             </div>
 
             <!-- Interview UI -->
@@ -316,6 +491,13 @@
                 <div class="timer-container">
                     <div id="timer-display" class="timer">10:00</div>
                 </div>
+
+                <!-- ✅ NEW: Warnings box -->
+                <div id="warning-box">
+                    <div id="warning-text"></div>
+                    <div id="warning-count"></div>
+                </div>
+
                 <div class="interview-grid">
                     <div class="transcript-panel">
                         <h3>AI Interviewer</h3>
@@ -334,8 +516,11 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Face API -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    <!-- Interview JS -->
     <script src="interview.js"></script>
 </body>
 </html>

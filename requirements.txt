@@ -51,6 +51,8 @@ mcp>=1.0.0
 
 
 # Utilities
+requests==2.31.0
+ddgs  # Renamed from duckduckgo-search
 python-jose==3.3.0
 passlib==1.7.4
 bcrypt==4.1.2
@@ -68,3 +70,4 @@ pytest==8.3.3
 pytest-asyncio==0.23.3
 httpx==0.26.0
 hf_xet
+ddgs

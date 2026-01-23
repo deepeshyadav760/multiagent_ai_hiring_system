@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     # --- Keys and Secrets ---
     GROQ_API_KEY: str
     SECRET_API_KEY: Optional[str] = None # For Google Forms integration
+    GITHUB_API_TOKEN: Optional[str] = None # For GitHub API integration
     
     # --- Database ---
     MONGODB_URL: str = "mongodb://localhost:27017"
