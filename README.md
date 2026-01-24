@@ -1,368 +1,60 @@
-# 🤖 Multi-Agent AI Hiring & Recruitment System
+# AI-Powered Recruiting & Talent Screening System
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.109.0-009688.svg)](https://fastapi.tiangolo.com/)
-[![CrewAI](https://img.shields.io/badge/CrewAI-0.28.8-orange.svg)](https://www.crewai.io/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248.svg)](https://www.mongodb.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+A fully functional, production-ready AI recruiting system powered by multi-agent architecture, featuring automated resume parsing, intelligent candidate matching, interview scheduling, and compliance monitoring.
 
-A **production-ready, enterprise-grade AI recruiting system** powered by a sophisticated multi-agent architecture. This system automates the entire recruitment pipeline from resume screening to interview scheduling, leveraging advanced LLMs, semantic search, and intelligent automation.
+## 🏗️ Architecture
 
-## 📋 Table of Contents
+### Multi-Agent System (Hierarchical Pattern)
 
-- [✨ Features](#-features)
-- [🏗️ System Architecture](#️-system-architecture)
-- [🤖 Multi-Agent Workflow](#-multi-agent-workflow)
-- [🔧 Technology Stack](#-technology-stack)
-- [📦 Installation](#-installation)
-- [🚀 Quick Start](#-quick-start)
-- [📡 API Endpoints](#-api-endpoints)
-- [🎯 Usage Examples](#-usage-examples)
-- [👥 Agent Details](#-agent-details)
-- [🗄️ Database Schema](#️-database-schema)
-- [⚙️ Configuration](#️-configuration)
-- [🔒 Security & Compliance](#-security--compliance)
-- [📈 Monitoring](#-monitoring)
-- [🐳 Deployment](#-deployment)
-- [🤝 Contributing](#-contributing)
+This system implements a **hierarchical agent architecture** with 6 specialized agents:
 
----
+1. **Orchestrator Agent** (Manager) - Coordinates all other agents and manages workflow
+2. **Resume Parsing Agent** - Extracts structured data from resumes
+3. **Job-Candidate Matching Agent** - Uses RAG for semantic job matching
+4. **Interview Scheduling Agent** - Manages calendar and schedules interviews
+5. **Communication Agent** - Handles all candidate communications
+6. **Compliance Agent** - Ensures fair, unbiased, and compliant recruitment
 
-## ✨ Features
+### Technology Stack
 
-### 🎯 Core Capabilities
+- **Framework**: FastAPI
+- **Agent Framework**: CrewAI (with hierarchical process)
+- **LLM**: Groq API (Llama3 70B)
+- **Embeddings**: sentence-transformers (MiniLM-L6-v2)
+- **Vector Store**: FAISS
+- **Database**: MongoDB (localhost:27017)
+- **MCP**: Model Context Protocol for tool standardization
+- **LlamaIndex**: For document processing and RAG
 
-#### **Intelligent Resume Processing**
-- 📄 Multi-format support (PDF, DOCX)
-- 🧠 LLM-powered data extraction
-- 🔍 Advanced NLP with spaCy
-- 📊 Structured data normalization
-- ✅ Auto-validation and quality checks
+## 🚀 Features
 
-#### **Smart Job-Candidate Matching (RAG)**
-- 🎯 Semantic similarity search using FAISS
-- 🔎 Vector embeddings for deep understanding
-- 📈 AI-powered score calculation
-- 🧩 Multi-dimensional skill matching
-- 📊 Ranked candidate recommendations
+### Core Capabilities
 
-#### **Automated Interview Management**
-- 📅 Google Calendar integration
-- 🤖 AI-powered interview scheduling
-- 💬 Real-time WebSocket interviews
-- 🎙️ Audio transcription support
-- 📹 Video proctoring & compliance monitoring
-- ⚡ Automated evaluation and scoring
+✅ **Automated Resume Processing**
+- Parse PDF/DOCX resumes
+- Extract skills, experience, education
+- Natural language understanding via LLM
 
-#### **Candidate Profile Enrichment**
-- 🐙 GitHub repository analysis
-- 🌐 Public profile research
-- 📊 Portfolio evaluation
-- 🏆 Project quality assessment
-- 📈 Comprehensive skill mapping
+✅ **Intelligent Job Matching (RAG)**
+- Semantic search using embeddings
+- LLM-powered candidate ranking
+- Contextual job-candidate alignment
 
-#### **Intelligent Communication**
-- ✉️ Automated email notifications
-- 📬 Multi-stage candidate updates
-- 🎯 Personalized messaging
-- 📧 SMTP integration
-- 🔔 Real-time status updates
+✅ **Interview Automation**
+- Calendar integration
+- Automatic scheduling
+- Meeting link generation
 
-#### **Compliance & Ethics**
-- ⚖️ Bias detection algorithms
-- 📝 Complete audit trail logging
-- 🔐 GDPR-compliant data handling
-- 📊 Diversity analytics
-- ✅ Fair evaluation standards
+✅ **Communication Management**
+- Application confirmations
+- Interview invitations
+- Follow-up reminders
+- Rejection notices
 
----
-
-## 🏗️ System Architecture
-
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        UI[Web Interface<br/>HTML/CSS/JS]
-        API_CLIENT[API Client]
-    end
-    
-    subgraph "API Layer - FastAPI"
-        MAIN[Main Application<br/>main.py]
-        ROUTES_UPLOAD[Upload Routes]
-        ROUTES_JOBS[Job Routes]
-        ROUTES_CANDIDATES[Candidate Routes]
-        ROUTES_INTERVIEWS[Interview Routes]
-        WS[WebSocket Server<br/>Real-time Interviews]
-    end
-    
-    subgraph "Multi-Agent System - CrewAI"
-        ORCHESTRATOR[Orchestrator Agent<br/>Master Coordinator]
-        
-        subgraph "Processing Agents"
-            RESUME[Resume Parsing<br/>Agent]
-            MATCHING[Job Matching<br/>Agent]
-            INTERVIEW[Interview<br/>Agent]
-        end
-        
-        subgraph "Enrichment Agents"
-            GITHUB[GitHub Analysis<br/>Agent]
-            PUBLIC[Public Search<br/>Agent]
-            SYNTHESIZER[Profile Synthesis<br/>Agent]
-        end
-        
-        subgraph "Support Agents"
-            SCHEDULING[Scheduling<br/>Agent]
-            COMMUNICATION[Communication<br/>Agent]
-            COMPLIANCE[Compliance<br/>Agent]
-            DECISION[Decision<br/>Agent]
-            SOURCING[Sourcing<br/>Agent]
-        end
-    end
-    
-    subgraph "Tools Layer - MCP Compliant"
-        RESUME_TOOL[Resume Parser Tool]
-        DB_TOOL[Database Tool<br/>MongoDB CRUD]
-        VECTOR_TOOL[Vector Search Tool<br/>FAISS]
-        EMAIL_TOOL[Email Tool<br/>SMTP]
-        CALENDAR_TOOL[Calendar Tool<br/>Google API]
-    end
-    
-    subgraph "AI/ML Layer"
-        LLM[Groq LLM<br/>Llama 3.3 70B]
-        EMBEDDINGS[Sentence Transformers<br/>MiniLM-L6-v2]
-        NLP[spaCy NLP<br/>en_core_web_sm]
-    end
-    
-    subgraph "Data Layer"
-        MONGODB[(MongoDB<br/>Document Store)]
-        FAISS[(FAISS<br/>Vector Index)]
-        STORAGE[File Storage<br/>uploads/]
-    end
-    
-    UI --> MAIN
-    API_CLIENT --> MAIN
-    
-    MAIN --> ROUTES_UPLOAD
-    MAIN --> ROUTES_JOBS
-    MAIN --> ROUTES_CANDIDATES
-    MAIN --> ROUTES_INTERVIEWS
-    MAIN --> WS
-    
-    ROUTES_UPLOAD --> ORCHESTRATOR
-    ROUTES_JOBS --> ORCHESTRATOR
-    ROUTES_CANDIDATES --> ORCHESTRATOR
-    ROUTES_INTERVIEWS --> ORCHESTRATOR
-    WS --> INTERVIEW
-    
-    ORCHESTRATOR --> RESUME
-    ORCHESTRATOR --> MATCHING
-    ORCHESTRATOR --> INTERVIEW
-    ORCHESTRATOR --> GITHUB
-    ORCHESTRATOR --> PUBLIC
-    ORCHESTRATOR --> SYNTHESIZER
-    ORCHESTRATOR --> SCHEDULING
-    ORCHESTRATOR --> COMMUNICATION
-    ORCHESTRATOR --> COMPLIANCE
-    ORCHESTRATOR --> DECISION
-    ORCHESTRATOR --> SOURCING
-    
-    RESUME --> RESUME_TOOL
-    MATCHING --> VECTOR_TOOL
-    INTERVIEW --> DB_TOOL
-    SCHEDULING --> CALENDAR_TOOL
-    COMMUNICATION --> EMAIL_TOOL
-    
-    RESUME_TOOL --> NLP
-    MATCHING --> EMBEDDINGS
-    INTERVIEW --> LLM
-    GITHUB --> LLM
-    PUBLIC --> LLM
-    SYNTHESIZER --> LLM
-    
-    DB_TOOL --> MONGODB
-    VECTOR_TOOL --> FAISS
-    RESUME_TOOL --> STORAGE
-    
-    style ORCHESTRATOR fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
-    style LLM fill:#4dabf7,stroke:#1971c2,stroke-width:2px
-    style MONGODB fill:#51cf66,stroke:#2f9e44,stroke-width:2px
-    style FAISS fill:#ffd43b,stroke:#f59f00,stroke-width:2px
-```
-
----
-
-## 🤖 Multi-Agent Workflow
-
-```mermaid
-flowchart TD
-    START([Candidate Applies]) --> UPLOAD[Upload Resume + Profile]
-    
-    UPLOAD --> ORCHESTRATOR{Orchestrator Agent<br/>Initiates Process}
-    
-    ORCHESTRATOR --> PARSE[Resume Parsing Agent<br/>Extract structured data]
-    
-    PARSE --> COMPLIANCE[Compliance Agent<br/>Bias Detection & Validation]
-    
-    COMPLIANCE --> STORE[Store Candidate in MongoDB]
-    
-    STORE --> ENRICH{Profile Enrichment<br/>if GitHub URL exists}
-    
-    ENRICH -->|Yes| GITHUB[GitHub Agent<br/>Analyze repositories]
-    ENRICH -->|No| MATCH
-    
-    GITHUB --> PUBLIC[Public Search Agent<br/>Research online presence]
-    
-    PUBLIC --> SYNTHESIZER[Synthesizer Agent<br/>Create comprehensive profile]
-    
-    SYNTHESIZER --> MATCH[Matching Agent<br/>RAG-based job matching]
-    
-    MATCH --> VECTOR[Vector Search Tool<br/>FAISS semantic search]
-    
-    VECTOR --> RANK[Calculate match scores<br/>for all active jobs]
-    
-    RANK --> COMM1[Communication Agent<br/>Send confirmation email]
-    
-    COMM1 --> WAIT{HR Reviews<br/>Top Candidates}
-    
-    WAIT -->|Shortlist| SHORTLIST[Orchestrator<br/>Create Interview Record]
-    WAIT -->|Reject| REJECT[Communication Agent<br/>Send rejection email]
-    
-    SHORTLIST --> SCHEDULE[Scheduling Agent<br/>Find available slot]
-    
-    SCHEDULE --> CAL[Calendar Tool<br/>Book Google Calendar]
-    
-    CAL --> COMM2[Communication Agent<br/>Send interview invitation]
-    
-    COMM2 --> VERIFY[Candidate uploads<br/>ID + Photo verification]
-    
-    VERIFY --> AI_INT[AI Interview Agent<br/>WebSocket connection]
-    
-    AI_INT --> TRANSCRIBE[Transcribe audio<br/>using Groq API]
-    
-    TRANSCRIBE --> EVALUATE[Evaluate responses<br/>Generate score]
-    
-    EVALUATE --> DECISION{Decision Agent<br/>Make hiring decision}
-    
-    DECISION -->|Pass| HIRE[Communication Agent<br/>Send offer letter]
-    DECISION -->|Fail| REJECT2[Communication Agent<br/>Send regret email]
-    
-    REJECT --> END([Process Complete])
-    HIRE --> END
-    REJECT2 --> END
-    
-    style ORCHESTRATOR fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
-    style GITHUB fill:#ffd43b,stroke:#f59f00,stroke-width:2px
-    style MATCH fill:#51cf66,stroke:#2f9e44,stroke-width:2px
-    style AI_INT fill:#4dabf7,stroke:#1971c2,stroke-width:2px
-    style DECISION fill:#ff922b,stroke:#e8590c,stroke-width:2px
-```
-
-### 📊 Agent Interaction Flow
-
-```mermaid
-sequenceDiagram
-    participant C as Candidate
-    participant API as FastAPI Server
-    participant O as Orchestrator
-    participant RP as Resume Parser
-    participant M as Matching Agent
-    participant S as Scheduling
-    participant I as Interview Agent
-    participant D as Decision Agent
-    participant CM as Communication
-    
-    C->>API: Upload Resume
-    API->>O: process_candidate_application()
-    
-    O->>RP: Parse resume
-    RP-->>O: Structured data
-    
-    O->>M: Match with jobs
-    M-->>O: Top 3 matching jobs
-    
-    O->>CM: Send confirmation
-    CM-->>C: Email: "Application received"
-    
-    Note over C,API: HR reviews candidates
-    
-    C->>API: HR shortlists candidate
-    API->>O: process_candidate_shortlisting()
-    
-    O->>S: Schedule interview
-    S-->>O: Time slot + Calendar invite
-    
-    O->>CM: Send invitation
-    CM-->>C: Email: "Interview scheduled"
-    
-    C->>API: Join interview (WebSocket)
-    API->>I: Start AI interview
-    
-    loop 5 Questions
-        I->>C: Ask question
-        C->>I: Audio response
-        I->>I: Transcribe + analyze
-    end
-    
-    I->>I: Evaluate performance
-    I-->>O: Interview score
-    
-    O->>D: Make hiring decision
-    D-->>O: HIRE / REJECT
-    
-    alt Hired
-        O->>CM: Send offer
-        CM-->>C: Email: "Congratulations!"
-    else Rejected
-        O->>CM: Send regret
-        CM-->>C: Email: "Thank you..."
-    end
-```
-
----
-
-## 🔧 Technology Stack
-
-### **Backend Framework**
-- **FastAPI** `0.109.0` - Modern async web framework
-- **Uvicorn** `0.27.0` - ASGI server
-- **Pydantic** `2.7.0` - Data validation
-
-### **AI/ML Stack**
-- **CrewAI** `0.28.8` - Multi-agent orchestration
-- **LangChain** `0.1.14` - LLM application framework
-- **LlamaIndex** `0.10.3` - Data framework for LLM apps
-- **Groq API** `0.4.2` - Ultra-fast LLM inference (Llama 3.3 70B)
-
-### **NLP & Embeddings**
-- **Sentence Transformers** `2.3.1` - Semantic embeddings
-- **spaCy** `3.7.2` - Advanced NLP
-- **Model**: `all-MiniLM-L6-v2` (384-dim embeddings)
-
-### **Vector Database**
-- **FAISS** `1.7.4` - Facebook AI Similarity Search
-- **Index Type**: IndexFlatL2 (L2 distance)
-
-### **Database**
-- **MongoDB** `4.6.1` - Primary data store
-- **Motor** `3.3.2` - Async MongoDB driver
-
-### **Document Processing**
-- **PyPDF2** `3.0.1` - PDF parsing
-- **python-docx** `1.1.0` - DOCX parsing
-- **pdfplumber** `0.10.3` - Advanced PDF extraction
-
-### **Integrations**
-- **Google Calendar API** `2.116.0` - Interview scheduling
-- **Gmail API** - Email notifications
-- **Google OAuth 2.0** - Authentication
-
-### **Utilities**
-- **Loguru** `0.7.2` - Advanced logging
-- **python-dotenv** `1.0.0` - Environment management
-- **Requests** `2.31.0` - HTTP client
-- **Pandas** `2.1.4` - Data manipulation
-
----
+✅ **Compliance & Diversity**
+- Bias detection in resumes
+- Audit trail logging
+- Fair evaluation standards
 
 ## 📦 Installation
 
@@ -1423,49 +1115,15 @@ Solution:
 ### Contact
 
 For issues or questions:
-- **GitHub Issues**: https://github.com/deepeshyadav760/multiagent_ai_hiring_system/issues
-- **Email**: deepeshyadav760@gmail.com
+1. Check API docs at `/docs`
+2. Review logs in `logs/` directory
+3. Check MongoDB connection
+4. Verify Groq API key
 
 ---
 
-## 🎓 Documentation
+**Built with**: CrewAI, FastAPI, Groq, MongoDB, FAISS, LlamaIndex
 
-Additional documentation available:
-- [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - Detailed codebase structure
-- [QUICKSTART.md](QUICKSTART.md) - Quick start guide
-- [SUMMARY.md](SUMMARY.md) - Project summary
+**Architecture**: Hierarchical Multi-Agent System with MCP
 
----
-
-## 🌟 Acknowledgments
-
-Built with these amazing technologies:
-- **CrewAI** - Multi-agent orchestration framework
-- **FastAPI** - Modern Python web framework
-- **Groq** - Ultra-fast LLM inference
-- **MongoDB** - Flexible document database
-- **FAISS** - Vector similarity search
-- **LangChain** - LLM application framework
-- **Sentence Transformers** - State-of-the-art embeddings
-
----
-
-## 📊 Project Status
-
-**Status**: ✅ Production Ready
-
-**Version**: 1.0.0
-
-**Last Updated**: January 2026
-
-**Maintained by**: [Deepesh Yadav](https://github.com/deepeshyadav760)
-
----
-
-<div align="center">
-
-**⭐ If this project helped you, please give it a star! ⭐**
-
-**Built with ❤️ using AI and Multi-Agent Systems**
-
-</div>
+**Status**: Production Ready ✅
