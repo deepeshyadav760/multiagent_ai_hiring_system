@@ -395,6 +395,42 @@ function stopVerificationCamera() {
 }
 
 // ✅ Silent snapshot capture during interview proctoring
+// async function captureSilentSnapshot() {
+//     try {
+//         if (!webcamEl || !webcamEl.srcObject) return;
+
+//         const canvas = document.createElement("canvas");
+//         canvas.width = webcamEl.videoWidth || 640;
+//         canvas.height = webcamEl.videoHeight || 480;
+
+//         const ctx = canvas.getContext("2d");
+
+//         // Mirror effect like camera preview
+//         ctx.translate(canvas.width, 0);
+//         ctx.scale(-1, 1);
+//         ctx.drawImage(webcamEl, 0, 0, canvas.width, canvas.height);
+
+//         const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.85));
+//         if (!blob) return;
+
+//         const formData = new FormData();
+//         formData.append("snapshot", blob, `snapshot_${Date.now()}.jpg`);
+
+//         await fetch(`${API_BASE}/api/interviews/${interviewId}/snapshot`, {
+//             method: "POST",
+//             body: formData
+//         });
+
+//         // ❌ No UI update — silent
+//         console.log("✅ Silent snapshot saved");
+
+//     } catch (err) {
+//         console.warn("Silent snapshot failed:", err);
+//     }
+// }
+
+
+
 async function captureSilentSnapshot() {
     try {
         if (!webcamEl || !webcamEl.srcObject) return;
@@ -418,6 +454,9 @@ async function captureSilentSnapshot() {
 
         await fetch(`${API_BASE}/api/interviews/${interviewId}/snapshot`, {
             method: "POST",
+            headers:{
+                "ngrok-skip-browser-warning": "true" // ✅ Add this line
+            },
             body: formData
         });
 
@@ -430,7 +469,58 @@ async function captureSilentSnapshot() {
 }
 
 
+
 // ✅ Upload ID + Candidate photo to backend
+// async function uploadVerificationData() {
+//     if (!interviewId) {
+//         verificationStatusEl.textContent = "❌ Interview ID missing in URL.";
+//         return;
+//     }
+
+//     if (!idCardInput.files || idCardInput.files.length === 0) {
+//         verificationStatusEl.textContent = "❌ Please upload ID card photo.";
+//         return;
+//     }
+
+//     if (!capturedPhotoBlob) {
+//         verificationStatusEl.textContent = "❌ Please capture your photo.";
+//         return;
+//     }
+
+//     try {
+//         uploadVerificationBtn.disabled = true;
+//         verificationStatusEl.textContent = "Uploading verification... please wait.";
+
+//         const formData = new FormData();
+//         formData.append("id_card", idCardInput.files[0]);
+//         formData.append("candidate_photo", capturedPhotoBlob, "candidate_photo.jpg");
+
+//         const res = await fetch(`${API_BASE}/api/interviews/${interviewId}/verification`, {
+//             method: "POST",
+//             body: formData
+//         });
+
+//         const data = await res.json();
+
+//         if (!res.ok) {
+//             throw new Error(data.detail || "Verification upload failed");
+//         }
+
+//         verificationUploaded = true;
+//         verificationStatusEl.textContent = "✅ Verification uploaded successfully. You can start setup now.";
+//         startBtn.disabled = false;
+//         startBtn.textContent = "Start Setup";
+
+//     } catch (err) {
+//         console.error("Verification upload error:", err);
+//         verificationStatusEl.textContent = "❌ Upload failed: " + err.message;
+//         uploadVerificationBtn.disabled = false;
+//         startBtn.disabled = true;
+//     }
+// }
+
+
+
 async function uploadVerificationData() {
     if (!interviewId) {
         verificationStatusEl.textContent = "❌ Interview ID missing in URL.";
@@ -457,6 +547,9 @@ async function uploadVerificationData() {
 
         const res = await fetch(`${API_BASE}/api/interviews/${interviewId}/verification`, {
             method: "POST",
+            headers:{
+                "ngrok-skip-browser-warning": "true" // ✅ Add this line
+            },
             body: formData
         });
 
@@ -478,6 +571,9 @@ async function uploadVerificationData() {
         startBtn.disabled = true;
     }
 }
+
+
+
 
 // --- Main Initialization Function ---
 async function initializeInterview() {
@@ -585,11 +681,32 @@ function showWarning(message) {
     }
 }
 
+// async function sendProctoringEvent(eventType, message) {
+//     try {
+//         await fetch(`${API_BASE}/api/interviews/${interviewId}/proctoring-event`, {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({
+//                 event_type: eventType,
+//                 message: message,
+//                 warnings: warnings,
+//                 timestamp: new Date().toISOString()
+//             })
+//         });
+//     } catch (err) {
+//         console.warn("Failed to send proctoring event:", err);
+//     }
+// }
+
+
 async function sendProctoringEvent(eventType, message) {
     try {
         await fetch(`${API_BASE}/api/interviews/${interviewId}/proctoring-event`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true" // ✅ Add this line
+            },
             body: JSON.stringify({
                 event_type: eventType,
                 message: message,
@@ -601,6 +718,8 @@ async function sendProctoringEvent(eventType, message) {
         console.warn("Failed to send proctoring event:", err);
     }
 }
+
+
 
 async function terminateInterviewDueToCheating(reason) {
     // update backend final status
@@ -822,9 +941,41 @@ function startInterviewTimer(duration) {
 }
 
 // --- WebSocket & Recording Logic ---
+// function setupWebSocket(stream) {
+//     let hasError = false;
+//     const socketUrl = `ws://localhost:8000/ws/interview/${interviewId}`; 
+//     socket = new WebSocket(socketUrl);
+
+//     socket.onopen = () => statusEl.textContent = "Connection established. The interview will begin shortly.";
+
+//     socket.onmessage = (event) => {
+//         const data = JSON.parse(event.data);
+//         if (data.type === "error") {
+//             hasError = true;
+//         }
+//         handleServerMessage(data, stream);
+//     };
+
+//     socket.onclose = () => {
+//         if (!hasError) {
+//              statusEl.textContent = "Interview session has ended. You may now close this window.";
+//         }
+//         stopEverything();
+//     };
+
+//     socket.onerror = () => {
+//         if (!hasError) {
+//              statusEl.textContent = "A connection error occurred. Please refresh the page.";
+//         }
+//         stopEverything();
+//     };
+// }
+
+
+// --- WebSocket & Recording Logic ---
 function setupWebSocket(stream) {
     let hasError = false;
-    const socketUrl = `ws://localhost:8000/ws/interview/${interviewId}`; 
+    const socketUrl = `wss://mac-interlunar-nonancestrally.ngrok-free.dev/ws/interview/${interviewId}`; 
     socket = new WebSocket(socketUrl);
 
     socket.onopen = () => statusEl.textContent = "Connection established. The interview will begin shortly.";
@@ -851,6 +1002,11 @@ function setupWebSocket(stream) {
         stopEverything();
     };
 }
+
+
+
+
+
 
 // Handle messages from server
 function handleServerMessage(data, stream) {

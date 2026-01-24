@@ -344,8 +344,26 @@ async function handlePostJobSubmit(event) {
 }
 
 // API Helper Function
+// async function fetchData(endpoint) {
+//     const response = await fetch(`${API_BASE}${endpoint}`);
+
+//     if (!response.ok) {
+//         const errorData = await response.json();
+//         throw new Error(errorData.detail || `Server returned status ${response.status}`);
+//     }
+
+//     return response.json();
+// }
+
+
 async function fetchData(endpoint) {
-    const response = await fetch(`${API_BASE}${endpoint}`);
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true" // ✅ Add this line
+        }
+    });
 
     if (!response.ok) {
         const errorData = await response.json();
@@ -354,6 +372,7 @@ async function fetchData(endpoint) {
 
     return response.json();
 }
+
 
 // Rendering Functions
 
