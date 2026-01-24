@@ -1,6 +1,9 @@
 // AI Recruiting System - Frontend Script
 
-const API_BASE = 'http://localhost:8000';
+// const API_BASE = 'http://localhost:8000';
+
+const API_BASE = "https://mac-interlunar-nonancestrally.ngrok-free.dev";
+const WS_BASE = "wss://mac-interlunar-nonancestrally.ngrok-free.dev";
 
 
 // State Management
