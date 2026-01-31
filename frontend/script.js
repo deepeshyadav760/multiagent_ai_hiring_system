@@ -361,7 +361,7 @@ async function fetchData(endpoint) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true" // ✅ Add this line
+            "ngrok-skip-browser-warning": "69420" // ✅ Add this line
         }
     });
 

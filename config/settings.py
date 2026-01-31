@@ -39,8 +39,11 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     ENV: str = "development" # Environment (e.g., development, production)
-    FRONTEND_URL: str = "http://127.0.0.1:5500"   # Add this line with a default value
+    # FRONTEND_URL: str = "http://127.0.0.1:5500"   # Add this line with a default value
     
+    FRONTEND_URL: str = "https://multiagent-ai-hiring-system.vercel.app"
+
+
     # --- File Paths ---
     VECTOR_STORE_PATH: str = "./data/vector_store"
     FAISS_INDEX_PATH: str = "./data/faiss_index"

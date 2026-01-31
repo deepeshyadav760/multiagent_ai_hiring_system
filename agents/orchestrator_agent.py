@@ -218,7 +218,7 @@ Professional Summary: {github_analysis.get('professional_summary', 'N/A')}"""
             
             unique_interview_id = str(ObjectId())
             base_url = settings.FRONTEND_URL.strip('/')
-            ai_interview_link = f"{base_url}/frontend/interview.html?interview_id={unique_interview_id}"
+            ai_interview_link = f"{base_url}/interview.html?interview_id={unique_interview_id}"
 
             ### FIX: Using the generic _run method to save the interview ###
             # This ensures that we have full control over the data being inserted and
@@ -289,6 +289,81 @@ Professional Summary: {github_analysis.get('professional_summary', 'N/A')}"""
             return self.communication_agent.send_rejection_notice(candidate_email, job_id)
         except Exception as e:
             log.error(f"Orchestrator error in rejection: {e}")
+            return {"success": False, "error": str(e)}
+
+
+# =====================================this is the new method to sync with the google form applications=========================================
+    def process_job_application(self, resume_path: str, applied_job_id: str, full_name: str, email: str = None, profile_image_path: str = None) -> Dict:
+        """
+        NEW: Specifically handles applications coming from the Google Form 
+        matched against a specific job selected by the candidate.
+        """
+        try:
+            log.info(f"Orchestrator: Processing specific application for {full_name} to Job {applied_job_id}")
+
+            # 1. Parse Resume
+            parse_result = self.resume_agent.process_resume(resume_path)
+            if not parse_result.get("success"):
+                return {"success": False, "error": "Resume parsing failed"}
+
+            # Use email from form if available, otherwise from resume
+            candidate_email = email or parse_result.get("candidate_email")
+            
+            # Update candidate record with full name from form if it was missing
+            database_tool._run(
+                action="update",
+                collection="candidates",
+                query={"email": candidate_email},
+                data={"name": full_name, "profile_image": profile_image_path}
+            )
+
+            # 2. Enrich Profile (GitHub + Public Search)
+            self.enrich_candidate_profile(candidate_email, job_id=applied_job_id)
+
+            # 3. Run Specific Match with Tips (Using the new Matching Agent method)
+            match_result = self.matching_agent.get_match_and_tips(candidate_email, applied_job_id)
+            
+            if not match_result.get("success"):
+                return {"success": False, "error": "Matching process failed"}
+
+            score = match_result.get("score", 0)
+            is_shortlisted = match_result.get("is_shortlisted", False)
+            tips = match_result.get("tips", [])
+
+            # 4. Handle Decision
+            if is_shortlisted:
+                log.info(f"Candidate {candidate_email} SHORTLISTED for {applied_job_id} with score {score}")
+                
+                # Create interview link and record
+                shortlist_data = self.process_candidate_shortlisting(candidate_email, applied_job_id)
+                
+                # Note: You might want to update your communication_agent to mention 
+                # the score even in the success email!
+                return {
+                    "success": True, 
+                    "message": f"Shortlisted! Score: {score}", 
+                    "applied_job_score": score
+                }
+            else:
+                log.info(f"Candidate {candidate_email} REJECTED for {applied_job_id} with score {score}")
+                
+                # Send rejection with score and tips
+                # Note: We call a specific rejection method that includes feedback
+                self.communication_agent.send_rejection_notice(
+                    candidate_email=candidate_email, 
+                    job_id=applied_job_id,
+                    score=score,
+                    tips=tips
+                )
+                
+                return {
+                    "success": True, 
+                    "message": f"Processed. Rejected with score: {score}", 
+                    "applied_job_score": score
+                }
+
+        except Exception as e:
+            log.error(f"Orchestrator error in job-specific application: {e}")
             return {"success": False, "error": str(e)}
 
 # Create a singleton instance

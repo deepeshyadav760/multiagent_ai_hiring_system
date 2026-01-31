@@ -23,6 +23,14 @@ body {
     background: white;
     border-bottom: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    /*this is to fix the position of the header*/
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001; /* High z-index to stay above everything */
+    height: 70px; /* Explicit height */
 }
 
 .header-content {
@@ -125,7 +133,16 @@ body {
 .nav {
     background: white;
     border-bottom: 1px solid #e2e8f0;
+
+    /*this is to fix the position of the nav bar*/
+    position: fixed;
+    top: 70px; /* Matches header height */
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 50px; /* Explicit height */
 }
+
 
 .nav-tabs {
     display: flex;
@@ -158,8 +175,25 @@ body {
 
 /* Main Content Styles */
 .main-content {
-    padding: 2rem 0;
+    /* padding: 2rem 0; */
+
+/* this is the new code for the main content padding --------------------------*/
+
+    /* Add padding to the top so content isn't hidden under the fixed bars */
+    /* Header (70px) + Nav (50px) + Extra Gap (20px) = 140px */
+    padding-top: 140px; 
+    padding-bottom: 2rem;
+    min-height: 100vh;
 }
+
+
+/* Optional: Improve the container alignment --------------------new code --------------*/
+.header .container, .nav .container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
 
 .loading {
     display: flex;

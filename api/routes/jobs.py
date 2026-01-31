@@ -94,6 +94,18 @@ async def get_jobs(limit: int = 50):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ======================================== Additional Endpoints =======================================google form====
+@router.get("/list-names")
+async def list_job_names():
+    try:
+        jobs = database_tool.get_active_jobs()
+        # Format for Google Form: "Software Engineer (JOB-AI-001)"
+        job_list = [f"{j['title']} ({j['job_id']})" for j in jobs]
+        return {"success": True, "jobs": job_list}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 @router.get("/{job_id}", response_model=dict)
 async def get_job(job_id: str):
     """Get a specific job posting"""

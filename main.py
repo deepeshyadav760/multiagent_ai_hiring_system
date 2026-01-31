@@ -17,7 +17,7 @@ import os
 import tempfile
 import asyncio
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from bson import ObjectId
 import uuid
 
@@ -30,6 +30,10 @@ from api.routes import upload, jobs, candidates, interviews
 from agents.orchestrator_agent import orchestrator
 from agents.interview_agent import interview_agent
 from tools.database_tool import database_tool
+from fastapi import Header, Form # Ensure Header and Form are imported
+
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 
 @asynccontextmanager
@@ -51,19 +55,31 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[
+#         "https://multiagent-ai-hiring-system.vercel.app/"
+#         "http://localhost",
+#         "http://127.0.0.1",
+#         "http://127.0.0.1:5500",
+#         "null",
+#     ],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*", "ngrok-skip-browser-warning"],
+# )
+
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://multiagent-ai-hiring-system.vercel.app/"
-        "http://localhost",
-        "http://127.0.0.1",
-        "http://127.0.0.1:5500",
-        "null",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 
 # Routers
 app.include_router(upload.router)
@@ -111,65 +127,65 @@ PROFILE_IMAGES_DIR = os.path.join(UPLOADS_DIR, "profile_images")
 os.makedirs(PROFILE_IMAGES_DIR, exist_ok=True)
 
 
-@app.post("/apply-for-job/", tags=["Resume"])
-async def handle_job_application(
-    job_id: str = Form(...),
-    full_name: str = Form(...),
-    email: str = Form(None),  # Optional - can be extracted from resume
-    resume: UploadFile = File(...),
-    profile_image: UploadFile = File(...)
-):
-    """
-    New endpoint for job-specific applications where candidate selects the job they want to apply for.
-    Includes profile image upload and full name.
-    """
-    try:
-        # Save resume
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        safe_resume_filename = f"{timestamp}_{resume.filename.replace(' ', '_')}"
-        resume_path = os.path.join(UPLOADS_DIR, safe_resume_filename)
+# @app.post("/apply-for-job/", tags=["Resume"])
+# async def handle_job_application(
+#     job_id: str = Form(...),
+#     full_name: str = Form(...),
+#     email: str = Form(None),  # Optional - can be extracted from resume
+#     resume: UploadFile = File(...),
+#     profile_image: UploadFile = File(...)
+# ):
+#     """
+#     New endpoint for job-specific applications where candidate selects the job they want to apply for.
+#     Includes profile image upload and full name.
+#     """
+#     try:
+#         # Save resume
+#         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+#         safe_resume_filename = f"{timestamp}_{resume.filename.replace(' ', '_')}"
+#         resume_path = os.path.join(UPLOADS_DIR, safe_resume_filename)
         
-        with open(resume_path, "wb") as buffer:
-            shutil.copyfileobj(resume.file, buffer)
+#         with open(resume_path, "wb") as buffer:
+#             shutil.copyfileobj(resume.file, buffer)
         
-        log.info(f"Resume uploaded and saved to: {resume_path}")
+#         log.info(f"Resume uploaded and saved to: {resume_path}")
         
-        # Save profile image
-        safe_name = full_name.replace(" ", "_").replace("/", "_")
-        image_ext = os.path.splitext(profile_image.filename)[1]
-        profile_image_filename = f"{timestamp}_{safe_name}{image_ext}"
-        profile_image_path = os.path.join(PROFILE_IMAGES_DIR, profile_image_filename)
+#         # Save profile image
+#         safe_name = full_name.replace(" ", "_").replace("/", "_")
+#         image_ext = os.path.splitext(profile_image.filename)[1]
+#         profile_image_filename = f"{timestamp}_{safe_name}{image_ext}"
+#         profile_image_path = os.path.join(PROFILE_IMAGES_DIR, profile_image_filename)
         
-        with open(profile_image_path, "wb") as buffer:
-            shutil.copyfileobj(profile_image.file, buffer)
+#         with open(profile_image_path, "wb") as buffer:
+#             shutil.copyfileobj(profile_image.file, buffer)
         
-        log.info(f"Profile image saved to: {profile_image_path}")
+#         log.info(f"Profile image saved to: {profile_image_path}")
         
-        # Process with orchestrator (new method for job-specific applications)
-        result = orchestrator.process_job_application(
-            resume_path=resume_path,
-            applied_job_id=job_id,
-            full_name=full_name,
-            email=email,
-            profile_image_path=profile_image_path
-        )
+#         # Process with orchestrator (new method for job-specific applications)
+#         result = orchestrator.process_job_application(
+#             resume_path=resume_path,
+#             applied_job_id=job_id,
+#             full_name=full_name,
+#             email=email,
+#             profile_image_path=profile_image_path
+#         )
         
-        if not result.get("success"):
-            raise HTTPException(status_code=400, detail=result.get("error", "Failed to process application."))
+#         if not result.get("success"):
+#             raise HTTPException(status_code=400, detail=result.get("error", "Failed to process application."))
         
-        return {
-            "success": True,
-            "message": result.get("message", "Application submitted successfully."),
-            "applied_job_id": job_id,
-            "match_score": result.get("applied_job_score", 0)
-        }
+#         return {
+#             "success": True,
+#             "message": result.get("message", "Application submitted successfully."),
+#             "applied_job_id": job_id,
+#             "match_score": result.get("applied_job_score", 0)
+#         }
     
-    except Exception as e:
-        log.error(f"Error during job application: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        resume.file.close()
-        profile_image.file.close()
+#     except Exception as e:
+#         log.error(f"Error during job application: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
+#     finally:
+#         resume.file.close()
+#         profile_image.file.close()
 
 
 
@@ -411,6 +427,7 @@ async def interview_websocket(websocket: WebSocket, interview_id: str):
             pass
 
 
+
 # ============================================================
 # Utility Endpoints
 # ============================================================
@@ -423,6 +440,52 @@ async def root():
         "docs": "/docs"
     }
 
+# ==============================================================this is new =======================================
+# --- ENDPOINT FOR GOOGLE FORM SUBMISSION ---
+@app.post("/apply-for-job/", tags=["Resume"])
+async def handle_job_application_final(
+    file: UploadFile = File(...),              # Matches "file" in Google Script
+    full_name: str = Form(...),                # Matches "full_name" in Google Script
+    email: str = Form(...),                    # Matches "email" in Google Script
+    job_id: str = Form(...),                   # Matches "job_id" in Google Script
+    profile_image: Optional[UploadFile] = File(None), # Optional - No error if missing
+    x_secret_key: str = Header(None)           # Security check
+):
+    # 1. Security Check
+    if x_secret_key != settings.SECRET_API_KEY:
+        log.error(f"Security Alert: Unauthorized key: {x_secret_key}")
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    try:
+        # 2. Save the uploaded Resume
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        safe_filename = f"{timestamp}_{file.filename.replace(' ', '_')}"
+        file_path = os.path.join(UPLOADS_DIR, safe_filename)
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        log.info(f"🚀 Form Received: {full_name} for Job {job_id}")
+
+        # 3. Trigger the Orchestrator
+        # This starts the AI Parsing -> Matching -> Emailing workflow
+        result = orchestrator.process_job_application(
+            resume_path=file_path,
+            applied_job_id=job_id,
+            full_name=full_name,
+            email=email
+        )
+
+        return {
+            "success": True, 
+            "message": "AI Agents have started processing your application.",
+            "score": result.get("applied_job_score")
+        }
+
+    except Exception as e:
+        log.error(f"Error in application processing: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
 
 @app.get("/health")
 async def health_check():
@@ -485,6 +548,11 @@ async def get_stats():
     except Exception as e:
         log.error(f"Error fetching stats: {e}")
         raise HTTPException(status_code=500, detail="Could not fetch system statistics.")
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    print(f"❌ VALIDATION ERROR: {exc.errors()}") # This will print the exact missing field in your terminal
+    return JSONResponse(status_code=422, content={"detail": exc.errors()})
 
 
 if __name__ == "__main__":
