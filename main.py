@@ -34,6 +34,7 @@ from fastapi import Header, Form # Ensure Header and Form are imported
 
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 
 @asynccontextmanager
@@ -79,6 +80,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve the uploads folder so resumes can be opened in the browser
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 # Routers
