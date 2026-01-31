@@ -23,30 +23,31 @@ body {
     background: white;
     border-bottom: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
-    /*this is to fix the position of the header*/
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1001; /* High z-index to stay above everything */
-    height: 70px; /* Explicit height */
+    z-index: 1001;
+    height: 80px; /* Adjusted height for the new logo */
 }
 
 .header-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Pushes logo left, button right */
     align-items: center;
-    padding: 1rem 0;
+    width: 100%;
+    height: 100%;
 }
 
+
+/*--logo section--*/
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
-.logo-icon {
+/* .logo-icon {
     width: 40px;
     height: 40px;
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
@@ -55,7 +56,17 @@ body {
     align-items: center;
     justify-content: center;
     color: white;
+} */
+
+.logo-img {
+    width: 50px;  /* Adjust size as needed */
+    height: 50px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #0f172a; /* Matches the dark background of your logo image */
+    padding: 2px;
 }
+
 
 .logo-text h1 {
     font-size: 1.25rem;
@@ -68,19 +79,21 @@ body {
     color: #64748b;
 }
 
+/*upload button--*/
 .upload-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.625rem 1rem;
+    padding: 0.625rem 1.25rem;
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     color: white;
     border-radius: 0.5rem;
     cursor: pointer;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.3s ease;
-    text-decoration: none;
+    white-space: nowrap; /* Prevents button text from wrapping */
+    margin-left: auto;   /* Extra safety to push right */
 }
 
 .upload-btn:hover {
@@ -133,14 +146,12 @@ body {
 .nav {
     background: white;
     border-bottom: 1px solid #e2e8f0;
-
-    /*this is to fix the position of the nav bar*/
     position: fixed;
-    top: 70px; /* Matches header height */
+    top: 80px; /* Must match .header height */
     left: 0;
     right: 0;
     z-index: 1000;
-    height: 50px; /* Explicit height */
+    height: 50px;
 }
 
 
@@ -175,17 +186,11 @@ body {
 
 /* Main Content Styles */
 .main-content {
-    /* padding: 2rem 0; */
-
-/* this is the new code for the main content padding --------------------------*/
-
-    /* Add padding to the top so content isn't hidden under the fixed bars */
-    /* Header (70px) + Nav (50px) + Extra Gap (20px) = 140px */
-    padding-top: 140px; 
+    /* Header (80px) + Nav (50px) + Gap (20px) = 150px */
+    padding-top: 150px; 
     padding-bottom: 2rem;
     min-height: 100vh;
 }
-
 
 /* Optional: Improve the container alignment --------------------new code --------------*/
 .header .container, .nav .container {
