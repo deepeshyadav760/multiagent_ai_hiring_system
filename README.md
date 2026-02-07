@@ -213,8 +213,8 @@ curl -X POST "http://localhost:8000/upload-resume/" \
 ```bash
 curl -X POST "http://localhost:8000/apply-for-job/" \
   -F "job_id=JOB-001" \
-  -F "full_name=John Doe" \
-  -F "email=john@example.com" \
+  -F "full_name=Deepesh Yadav" \
+  -F "email=deepeshyadav760@gmail.com" \
   -F "resume=@resume.pdf" \
   -F "profile_image=@photo.jpg"
 ```
@@ -267,7 +267,7 @@ curl "http://localhost:8000/candidates/?status=pending&min_score=70"
 
 **Example - Shortlist Candidate:**
 ```bash
-curl -X POST "http://localhost:8000/candidates/john@example.com/shortlist/JOB-001"
+curl -X POST "http://localhost:8000/candidates/deepesh@example.com/shortlist/JOB-001"
 ```
 
 ### 🎤 Interview Endpoints
@@ -346,7 +346,7 @@ print(f"Total interviews: {len(interviews)}")
 import requests
 
 BASE_URL = "http://localhost:8000"
-candidate_email = "john.doe@example.com"
+candidate_email = "deepesh.Yadav@example.com"
 job_id = "JOB-001"
 
 # Trigger profile enrichment (GitHub + public search)
@@ -424,14 +424,14 @@ for filename in os.listdir(resume_folder):
 **Output**:
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
+  "name": "deepesh Yadav",
+  "email": "deepesh@example.com",
   "phone": "+1234567890",
   "skills": ["Python", "FastAPI", "MongoDB"],
   "experience_years": 5,
   "education": "BS Computer Science",
   "resume_text": "Full extracted text...",
-  "github_url": "https://github.com/johndoe"
+  "github_url": "https://github.com/deepeshYadav"
 }
 ```
 
@@ -495,7 +495,7 @@ for filename in os.listdir(resume_folder):
 **Output**:
 ```json
 {
-  "repo_url": "https://github.com/johndoe/ai-project",
+  "repo_url": "https://github.com/deepeshYadav/ai-project",
   "technologies": ["Python", "TensorFlow", "FastAPI"],
   "quality_score": 8.5,
   "relevance_to_job": "High - demonstrates ML expertise"
@@ -624,16 +624,16 @@ All actions logged to `compliance_logs` collection with:
 ```javascript
 {
   _id: ObjectId("..."),
-  name: "John Doe",
-  email: "john@example.com",
+  name: "deepesh Yadav",
+  email: "deepesh@example.com",
   phone: "+1234567890",
   skills: ["Python", "FastAPI", "MongoDB"],
   experience_years: 5,
   education: "BS Computer Science",
   resume_text: "Full resume content...",
   resume_file_path: "/uploads/resume_20240123.pdf",
-  profile_image_path: "/uploads/profile_images/john_doe.jpg",
-  github_url: "https://github.com/johndoe",
+  profile_image_path: "/uploads/profile_images/deepesh_Yadav.jpg",
+  github_url: "https://github.com/deepeshYadav",
   matched_jobs: [
     {
       job_id: "JOB-001",
@@ -667,7 +667,7 @@ All actions logged to `compliance_logs` collection with:
   status: "active", // active, closed, on_hold
   matched_candidates: [
     {
-      email: "john@example.com",
+      email: "deepesh@example.com",
       score: 85.5,
       matched_at: ISODate("2024-01-23T10:00:00Z")
     }
@@ -682,7 +682,7 @@ All actions logged to `compliance_logs` collection with:
 {
   _id: ObjectId("..."),
   interview_id: "INT-001",
-  candidate_email: "john@example.com",
+  candidate_email: "deepesh@example.com",
   candidate_id: ObjectId("..."),
   job_id: "JOB-001",
   scheduled_time: ISODate("2024-01-25T14:00:00Z"),
