@@ -56,29 +56,27 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=[
-#         "https://multiagent-ai-hiring-system.vercel.app/"
-#         "http://localhost",
-#         "http://127.0.0.1",
-#         "http://127.0.0.1:5500",
-#         "null",
-#     ],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*", "ngrok-skip-browser-warning"],
-# )
-
-
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://multiagent-ai-hiring-system.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:5500",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 # Serve the uploads folder so resumes can be opened in the browser
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
@@ -315,7 +313,7 @@ async def record_proctoring_event(interview_id: str, payload: Dict[str, Any] = B
 
 
 # ============================================================
-# ✅ WebSocket Interview Endpoint (FINAL FIXED)
+# ✅ WebSocket Interview Endpoint
 # ============================================================
 @app.websocket("/ws/interview/{interview_id}")
 async def interview_websocket(websocket: WebSocket, interview_id: str):

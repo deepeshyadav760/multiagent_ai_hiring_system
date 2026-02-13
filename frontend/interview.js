@@ -972,10 +972,13 @@ function startInterviewTimer(duration) {
 // }
 
 
+
 // --- WebSocket & Recording Logic ---
 function setupWebSocket(stream) {
     let hasError = false;
-    const socketUrl = `wss://mac-interlunar-nonancestrally.ngrok-free.dev/ws/interview/${interviewId}`; 
+    // const socketUrl = `wss://mac-interlunar-nonancestrally.ngrok-free.dev/ws/interview/${interviewId}`; 
+    const socketUrl = `wss://432c-106-192-229-160.ngrok-free.app/ws/interview/${interviewId}`;
+
     socket = new WebSocket(socketUrl);
 
     socket.onopen = () => statusEl.textContent = "Connection established. The interview will begin shortly.";
