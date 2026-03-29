@@ -62,6 +62,7 @@ app.add_middleware(
         "https://multiagent-ai-hiring-system.vercel.app",
         "http://localhost:3000",
         "http://127.0.0.1:5500",
+        "https://mac-interlunar-nonancestrally.ngrok-free.dev",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -126,68 +127,6 @@ async def handle_resume_upload(file: UploadFile = File(...)):
 # ============================================================
 PROFILE_IMAGES_DIR = os.path.join(UPLOADS_DIR, "profile_images")
 os.makedirs(PROFILE_IMAGES_DIR, exist_ok=True)
-
-
-# @app.post("/apply-for-job/", tags=["Resume"])
-# async def handle_job_application(
-#     job_id: str = Form(...),
-#     full_name: str = Form(...),
-#     email: str = Form(None),  # Optional - can be extracted from resume
-#     resume: UploadFile = File(...),
-#     profile_image: UploadFile = File(...)
-# ):
-#     """
-#     New endpoint for job-specific applications where candidate selects the job they want to apply for.
-#     Includes profile image upload and full name.
-#     """
-#     try:
-#         # Save resume
-#         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-#         safe_resume_filename = f"{timestamp}_{resume.filename.replace(' ', '_')}"
-#         resume_path = os.path.join(UPLOADS_DIR, safe_resume_filename)
-        
-#         with open(resume_path, "wb") as buffer:
-#             shutil.copyfileobj(resume.file, buffer)
-        
-#         log.info(f"Resume uploaded and saved to: {resume_path}")
-        
-#         # Save profile image
-#         safe_name = full_name.replace(" ", "_").replace("/", "_")
-#         image_ext = os.path.splitext(profile_image.filename)[1]
-#         profile_image_filename = f"{timestamp}_{safe_name}{image_ext}"
-#         profile_image_path = os.path.join(PROFILE_IMAGES_DIR, profile_image_filename)
-        
-#         with open(profile_image_path, "wb") as buffer:
-#             shutil.copyfileobj(profile_image.file, buffer)
-        
-#         log.info(f"Profile image saved to: {profile_image_path}")
-        
-#         # Process with orchestrator (new method for job-specific applications)
-#         result = orchestrator.process_job_application(
-#             resume_path=resume_path,
-#             applied_job_id=job_id,
-#             full_name=full_name,
-#             email=email,
-#             profile_image_path=profile_image_path
-#         )
-        
-#         if not result.get("success"):
-#             raise HTTPException(status_code=400, detail=result.get("error", "Failed to process application."))
-        
-#         return {
-#             "success": True,
-#             "message": result.get("message", "Application submitted successfully."),
-#             "applied_job_id": job_id,
-#             "match_score": result.get("applied_job_score", 0)
-#         }
-    
-#     except Exception as e:
-#         log.error(f"Error during job application: {e}")
-#         raise HTTPException(status_code=500, detail=str(e))
-#     finally:
-#         resume.file.close()
-#         profile_image.file.close()
-
 
 
 # ============================================================

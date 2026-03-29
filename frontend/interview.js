@@ -268,8 +268,8 @@ let timerStarted = false;
 // ✅ NEW proctoring state
 let warnings = 0;
 let violations = 0;
-const VIOLATIONS_PER_WARNING = 15;   // e.g., every 15 violations = 1 warning
-const MAX_WARNINGS = 5;
+const VIOLATIONS_PER_WARNING = 50;   // e.g., every 15 violations = 1 warning
+const MAX_WARNINGS = 3;
 let lastPopupShownAtWarning = 0;
 let verificationUploaded = false;
 let capturedPhotoBlob = null;
@@ -277,7 +277,7 @@ let captureStream = null;
 
 // ✅ API base URL
 // IMPORTANT: Use same port as your FastAPI backend
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://mac-interlunar-nonancestrally.ngrok-free.dev";
 
 // --- Event Listeners ---
 startBtn.addEventListener('click', initializeInterview);
@@ -394,42 +394,6 @@ function stopVerificationCamera() {
     }
 }
 
-// ✅ Silent snapshot capture during interview proctoring
-// async function captureSilentSnapshot() {
-//     try {
-//         if (!webcamEl || !webcamEl.srcObject) return;
-
-//         const canvas = document.createElement("canvas");
-//         canvas.width = webcamEl.videoWidth || 640;
-//         canvas.height = webcamEl.videoHeight || 480;
-
-//         const ctx = canvas.getContext("2d");
-
-//         // Mirror effect like camera preview
-//         ctx.translate(canvas.width, 0);
-//         ctx.scale(-1, 1);
-//         ctx.drawImage(webcamEl, 0, 0, canvas.width, canvas.height);
-
-//         const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.85));
-//         if (!blob) return;
-
-//         const formData = new FormData();
-//         formData.append("snapshot", blob, `snapshot_${Date.now()}.jpg`);
-
-//         await fetch(`${API_BASE}/api/interviews/${interviewId}/snapshot`, {
-//             method: "POST",
-//             body: formData
-//         });
-
-//         // ❌ No UI update — silent
-//         console.log("✅ Silent snapshot saved");
-
-//     } catch (err) {
-//         console.warn("Silent snapshot failed:", err);
-//     }
-// }
-
-
 
 async function captureSilentSnapshot() {
     try {
@@ -455,7 +419,7 @@ async function captureSilentSnapshot() {
         await fetch(`${API_BASE}/api/interviews/${interviewId}/snapshot`, {
             method: "POST",
             headers:{
-                "ngrok-skip-browser-warning": "true" // ✅ Add this line
+                "ngrok-skip-browser-warning": "69420"
             },
             body: formData
         });
@@ -467,59 +431,6 @@ async function captureSilentSnapshot() {
         console.warn("Silent snapshot failed:", err);
     }
 }
-
-
-
-// ✅ Upload ID + Candidate photo to backend
-// async function uploadVerificationData() {
-//     if (!interviewId) {
-//         verificationStatusEl.textContent = "❌ Interview ID missing in URL.";
-//         return;
-//     }
-
-//     if (!idCardInput.files || idCardInput.files.length === 0) {
-//         verificationStatusEl.textContent = "❌ Please upload ID card photo.";
-//         return;
-//     }
-
-//     if (!capturedPhotoBlob) {
-//         verificationStatusEl.textContent = "❌ Please capture your photo.";
-//         return;
-//     }
-
-//     try {
-//         uploadVerificationBtn.disabled = true;
-//         verificationStatusEl.textContent = "Uploading verification... please wait.";
-
-//         const formData = new FormData();
-//         formData.append("id_card", idCardInput.files[0]);
-//         formData.append("candidate_photo", capturedPhotoBlob, "candidate_photo.jpg");
-
-//         const res = await fetch(`${API_BASE}/api/interviews/${interviewId}/verification`, {
-//             method: "POST",
-//             body: formData
-//         });
-
-//         const data = await res.json();
-
-//         if (!res.ok) {
-//             throw new Error(data.detail || "Verification upload failed");
-//         }
-
-//         verificationUploaded = true;
-//         verificationStatusEl.textContent = "✅ Verification uploaded successfully. You can start setup now.";
-//         startBtn.disabled = false;
-//         startBtn.textContent = "Start Setup";
-
-//     } catch (err) {
-//         console.error("Verification upload error:", err);
-//         verificationStatusEl.textContent = "❌ Upload failed: " + err.message;
-//         uploadVerificationBtn.disabled = false;
-//         startBtn.disabled = true;
-//     }
-// }
-
-
 
 async function uploadVerificationData() {
     if (!interviewId) {
@@ -705,7 +616,7 @@ async function sendProctoringEvent(eventType, message) {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "true" // ✅ Add this line
+                "ngrok-skip-browser-warning": "69420"
             },
             body: JSON.stringify({
                 event_type: eventType,
@@ -940,44 +851,12 @@ function startInterviewTimer(duration) {
     }, 1000);
 }
 
-// --- WebSocket & Recording Logic ---
-// function setupWebSocket(stream) {
-//     let hasError = false;
-//     const socketUrl = `ws://localhost:8000/ws/interview/${interviewId}`; 
-//     socket = new WebSocket(socketUrl);
-
-//     socket.onopen = () => statusEl.textContent = "Connection established. The interview will begin shortly.";
-
-//     socket.onmessage = (event) => {
-//         const data = JSON.parse(event.data);
-//         if (data.type === "error") {
-//             hasError = true;
-//         }
-//         handleServerMessage(data, stream);
-//     };
-
-//     socket.onclose = () => {
-//         if (!hasError) {
-//              statusEl.textContent = "Interview session has ended. You may now close this window.";
-//         }
-//         stopEverything();
-//     };
-
-//     socket.onerror = () => {
-//         if (!hasError) {
-//              statusEl.textContent = "A connection error occurred. Please refresh the page.";
-//         }
-//         stopEverything();
-//     };
-// }
-
 
 
 // --- WebSocket & Recording Logic ---
 function setupWebSocket(stream) {
     let hasError = false;
-    // const socketUrl = `wss://mac-interlunar-nonancestrally.ngrok-free.dev/ws/interview/${interviewId}`; 
-    const socketUrl = `wss://432c-106-192-229-160.ngrok-free.app/ws/interview/${interviewId}`;
+    const socketUrl = `wss://mac-interlunar-nonancestrally.ngrok-free.dev/ws/interview/${interviewId}`;
 
     socket = new WebSocket(socketUrl);
 
